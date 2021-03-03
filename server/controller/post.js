@@ -1,0 +1,31 @@
+import mongoose from 'mongoose';
+import Post from '../models/post.js';
+import User from '../models/user.js';
+
+
+export const getPosts = async (req, res) => {
+
+    try {
+        const allPosts = (await Post.find()).reverse();
+        return res.status(200).json(allPosts);
+    } catch (error) {
+        return res.status(500).jsom({ message: "somethings went wrong." });
+    }
+}
+
+
+export const createPost = async (req, res) => {
+
+    if (!req.userId) return res.status(404).json("Unauthorized User")
+    const postData = req.body;
+    const newPost = Post({ ...postData, createdAt: new Date().toISOString() })
+    try {
+        await newPost.save();
+        const { tags, message, file, comments, likes, createdAt } = newPost;
+        await User.updateOne({ username: newPost.username }, { $push: { posts: { tags, message, file, comments, likes, createdAt } } });
+        return res.status(200).json(newPost);
+    } catch (error) {
+        return res.status(500).json({ message: 'something went wrong.' })
+    }
+}
+
