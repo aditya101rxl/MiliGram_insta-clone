@@ -11,6 +11,15 @@ export default (state, action) => {
         case 'LOGOUT':
             localStorage.clear();
             return { ...state, user: action.payload }
+        case 'LIKE':
+        case 'DISLIKE':
+            return {
+                ...state, posts: state.posts.map(post =>
+                    post._id === action.payload.id ?
+                        ({ ...post, likes: action.payload.data })
+                        : post
+                )
+            }
         default:
             return state;
     }

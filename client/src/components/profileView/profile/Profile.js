@@ -139,15 +139,25 @@ export const Profile = () => {
                                             Follow
                                         </Button>
                                     )}
-                                    <Button
-                                        fullWidth
-                                        disabled={(user._id) !== (existingUser?._id)}
-                                        variant="outlined"
-                                        color='primary'
-                                        onClick={handleCreatePost}
-                                        className={classes.margin}>
-                                        Create New Post
-                                    </Button>
+                                    {(user._id) === (existingUser?._id) ? (
+                                        <Button
+                                            fullWidth
+                                            variant="outlined"
+                                            color='primary'
+                                            onClick={handleCreatePost}
+                                            className={classes.margin}>
+                                            Create New Post
+                                        </Button>
+                                    ) : (
+                                            <Button
+                                                fullWidth
+                                                variant="outlined"
+                                                color='primary'
+                                                onClick={()=> history.push('/user/inbox')}
+                                                className={classes.margin}>
+                                                Message
+                                            </Button>
+                                        )}
                                 </div>
 
                             </Grid>

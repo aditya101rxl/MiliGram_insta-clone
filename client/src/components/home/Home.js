@@ -13,6 +13,11 @@ const useStyles = makeStyles((theme) => ({
             display: 'none',
         },
     },
+    scrollbar: {
+        '&::-webkit-scrollbar': {
+            display: 'none'
+        }
+    }
 }));
 
 export const Home = () => {
@@ -24,7 +29,7 @@ export const Home = () => {
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} sm={8}>
-                <Box component="div" height="86vh" overflow="auto" >
+                <Box component="div" height="86vh" overflow="auto" className={classes.scrollbar}>
                     {posts.length ? (
                         posts.map(post => <Feeds post={post} />)
                     ) : (
@@ -35,7 +40,7 @@ export const Home = () => {
             <Grid item xs={12} sm={4} className={classes.sectionMobile}>
                 <Profile />
             </Grid>
-        </Grid>
+        </Grid >
     )
 }
 

@@ -10,6 +10,7 @@ import HomeIcon from '@material-ui/icons/Home';
 import { useStyles } from './style';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import { Link, useHistory, useLocation } from 'react-router-dom'
+import logo from '../logo.png'
 
 function ElevationScroll(props) {
 
@@ -143,7 +144,9 @@ export const Navbar = (props) => {
                     <AppBar color='default'>
                         <Toolbar>
                             <div className={classes.grow} />
-                            <Typography className={classes.title} component={Link} to='/' variant="h6" noWrap> MiliGram</Typography>
+                            <Link to='/'>
+                                <img src={logo} alt='logo' className={classes.logo} />
+                            </Link>
                             <div className={classes.grow} />
                             <div className={classes.search}>
                                 <div className={classes.searchIcon}>
@@ -217,6 +220,7 @@ export const Navbar = (props) => {
             <Toolbar />
             <Container>
                 <Box my={1}>
+
                 </Box>
             </Container>
         </React.Fragment >

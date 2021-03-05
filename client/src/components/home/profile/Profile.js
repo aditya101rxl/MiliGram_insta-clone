@@ -9,6 +9,8 @@ export const Profile = () => {
     const history = useHistory()
     const user = JSON.parse(localStorage.getItem('profile'))?.result;
 
+    console.log(user);
+
     const logout = () => {
         localStorage.clear();
         window.location.reload()

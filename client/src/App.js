@@ -7,7 +7,7 @@ import { Navbar } from './components/navbar/Navbar'
 import { Profile } from './components/profileView/profile/Profile'
 import { Form } from './components/createPost/Form'
 import { PostView } from './components/postsView/PostView'
-import { Inbox } from './components/inbox/Inbox'
+import { ChatBody } from './components/inbox/chatBody/ChatBody'
 
 const App = () => {
   const user = JSON.parse(localStorage.getItem('profile'))?.result.username;
@@ -20,7 +20,7 @@ const App = () => {
             <Route exact path="/" component={Home} />
             <Route exact path="/user/auth" component={Auth} />
             <Route exact path="/post/createPost" component={Form} />
-            <Route exact path="/user/inbox" component={Inbox} />
+            <Route exact path="/user/inbox" component={ChatBody} />
             <Route path="/post/postView/:id" component={PostView} />
             <Route path="/user/profile/:username" component={Profile} />
           </Switch>

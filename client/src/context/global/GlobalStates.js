@@ -18,6 +18,7 @@ export const GlobalProvider = ({ children }) => {
     const signin = async (formData, history) => {
         try {
             const { data } = await api.signin(formData)
+            console.log(data);
             dispatch({ type: 'SIGNIN', payload: data })
             history.push('/')
         } catch (error) {
@@ -58,6 +59,16 @@ export const GlobalProvider = ({ children }) => {
         }
     }
 
+    const like = (data, id, user) => {
+        dispatch({ type: 'LIKE', payload: { id, data } })
+        api.like({ id, user, islike: true });
+    }
+
+    const dislike = (data, id, user) => {
+        dispatch({ type: 'DISLIKE', payload: { id, data } })
+        api.like({ id, user, islike: false });
+    }
+
     useEffect(() => {
         getPosts();
     }, [])
@@ -71,6 +82,8 @@ export const GlobalProvider = ({ children }) => {
             logout,
             createPost,
             getPosts,
+            like,
+            dislike,
         }}>
             {children}
         </GlobalContext.Provider>

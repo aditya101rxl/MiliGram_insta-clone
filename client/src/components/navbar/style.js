@@ -65,4 +65,9 @@ export const useStyles = makeStyles((theme) => ({
             display: 'none',
         },
     },
+    logo: {
+        marginLeft: '-42px',
+        width: '250px',
+        height: '50px',
+    }
 }));

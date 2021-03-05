@@ -15,7 +15,8 @@ export const signup = (signupData) => API.post('/user/signup', signupData);
 export const findUser = (username) => API.get(`/user/profile/${username}`);
 export const updateProfile = (id, data) => API.patch(`/user/profile/update/${id}`, data);
 export const follow = (data) => API.patch(`/user/follow`, data);
+export const like = (data) => API.patch('/user/like', data);
 
 
-export const createPost = (data) => API.post(`/post/createPost`, data);
 export const getPosts = () => API.get('/post');
+export const createPost = (data) => API.post(`/post/createPost`, data);

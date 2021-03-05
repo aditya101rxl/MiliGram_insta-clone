@@ -5,8 +5,8 @@ import bodyParser from 'body-parser'
 
 import userRoute from './routes/user.js';
 import postRoute from './routes/post.js';
-import inbox from './routes/inbox.js'
-import { CONNECTION_URL } from './private.js'
+import inbox from './routes/inbox.js';
+import { CONNECTION_URL } from './private.js';
 
 const app = express();
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
