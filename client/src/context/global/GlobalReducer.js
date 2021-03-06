@@ -15,10 +15,16 @@ export default (state, action) => {
         case 'DISLIKE':
             return {
                 ...state, posts: state.posts.map(post =>
-                    post._id === action.payload.id ?
-                        ({ ...post, likes: action.payload.data })
-                        : post
-                )
+                    post._id === action.payload.id ? (
+                        { ...post, likes: action.payload.data }
+                    ) : post)
+            }
+        case 'COMMENT':
+            return {
+                ...state, posts: state.posts.map(post =>
+                    post._id === action.payload.id ? (
+                        { ...post, comments: action.payload.data }
+                    ) : post)
             }
         default:
             return state;

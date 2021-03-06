@@ -73,7 +73,3 @@ export const follow = async (req, res) => {
         }
     }
 }
-
-export const like = async (req, res) => {
-    console.log(req.body);
-}

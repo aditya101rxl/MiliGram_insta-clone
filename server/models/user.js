@@ -10,6 +10,7 @@ const userSchema = mongoose.Schema({
     posts: { type: [Object], default: [] },
     followers: { type: [String], default: [] },
     following: { type: [String], default: [] },
+    notification: { type: [String], default: [] },
 })
 
 export default mongoose.model('User', userSchema);

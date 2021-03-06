@@ -2,6 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose'
 import cors from 'cors'
 import bodyParser from 'body-parser'
+import http from 'http'
+import * as io from 'socket.io'
 
 import userRoute from './routes/user.js';
 import postRoute from './routes/post.js';
@@ -20,9 +22,21 @@ app.use('/inbox', inbox);
 
 const PORT = process.env.PORT || 5000;
 
+const server = http.createServer(app);
+const socketio = new io.Server(http, {
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"]
+    }
+})
+
+socketio.on('connection', socket => {
+    console.log('connected');
+    console.log(socket);
+})
 
 mongoose.connect(CONNECTION_URL, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => { app.listen(PORT, () => console.log(`server is running on port : ${PORT}`)) })
+    .then(() => { server.listen(PORT, () => console.log(`socket server is running on port : ${PORT}`)) })
     .catch(err => console.log(err.message))
 
 mongoose.set("useFindAndModify", false);

@@ -1,6 +1,7 @@
-import React, { createContext, useReducer, useEffect } from 'react'
+import React, { createContext, useReducer, useEffect, useState } from 'react'
 import GlobalReducer from './GlobalReducer'
 import * as api from '../../api'
+import socketio from 'socket.io-client';
 
 
 const initialState = {
@@ -12,7 +13,8 @@ export const GlobalContext = createContext(initialState)
 export const GlobalProvider = ({ children }) => {
 
     const [state, dispatch] = useReducer(GlobalReducer, initialState);
-
+    const user = JSON.parse(localStorage.getItem('profile'))?.result
+    console.log(user);
 
     // Authorization actions
     const signin = async (formData, history) => {
@@ -59,15 +61,26 @@ export const GlobalProvider = ({ children }) => {
         }
     }
 
-    const like = (data, id, user) => {
+    const like = ({ data, id, user }) => {
+        api.like({ _id: id, username: user, islike: true });
         dispatch({ type: 'LIKE', payload: { id, data } })
-        api.like({ id, user, islike: true });
     }
 
-    const dislike = (data, id, user) => {
+    const dislike = ({ data, id, user }) => {
+        api.like({ _id: id, username: user, islike: false });
         dispatch({ type: 'DISLIKE', payload: { id, data } })
-        api.like({ id, user, islike: false });
     }
+
+    const commentPost = ({ data, comment, id }) => {
+        api.comment({ _id: id, comment });
+        dispatch({ type: 'COMMENT', payload: { id, data } });
+        console.log(comment, id);
+    }
+
+    // socket connection if user exist
+    useEffect(() => {
+        console.log('user changed..');
+    }, [user])
 
     useEffect(() => {
         getPosts();
@@ -84,6 +97,7 @@ export const GlobalProvider = ({ children }) => {
             getPosts,
             like,
             dislike,
+            commentPost,
         }}>
             {children}
         </GlobalContext.Provider>

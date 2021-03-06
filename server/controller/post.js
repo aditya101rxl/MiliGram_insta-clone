@@ -29,3 +29,16 @@ export const createPost = async (req, res) => {
     }
 }
 
+export const like = async (req) => {
+    const { _id, username, islike } = req.body;
+    if (islike) {
+        await Post.findByIdAndUpdate(_id, { $push: { likes: username } });
+    } else {
+        await Post.findByIdAndUpdate(_id, { $pull: { likes: username } });
+    }
+}
+
+export const comment = async (req) => {
+    const { _id, comment } = req.body;
+    await Post.findByIdAndUpdate(_id, { $push: { comments: comment } });
+}

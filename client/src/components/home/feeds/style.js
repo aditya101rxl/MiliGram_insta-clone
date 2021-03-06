@@ -34,13 +34,12 @@ export const useStyles = makeStyles((theme) => ({
         cursor: 'pointer',
         "&:hover": {
             textDecoration: 'underline',
-            color: 'crimson',
         }
     },
     search: {
-        width:'100%',
-        marginTop:'-13px',
-        marginLeft:'27px'
+        width: '100%',
+        marginTop: '-13px',
+        marginLeft: '27px'
     },
     inputRoot: {
         color: 'inherit',
@@ -58,4 +57,9 @@ export const useStyles = makeStyles((theme) => ({
             },
         },
     },
+    hover: {
+        '&:hover': {
+            cursor: 'pointer',
+        }
+    }
 }));

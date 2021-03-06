@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
-import * as api from '../../../api'
 
 import clsx from 'clsx';
-import { Paper, Card, CardHeader, CardMedia, CardContent, CardActions, TextField, InputBase } from '@material-ui/core'
+import { Fab, Paper, Card, CardHeader, CardMedia, CardContent, CardActions, TextField, InputBase } from '@material-ui/core'
 import Collapse from '@material-ui/core/Collapse';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
@@ -22,35 +21,41 @@ import { GlobalContext } from '../../../context/global/GlobalStates';
 export const Feeds = ({ post }) => {
     const classes = useStyles();
     const history = useHistory();
-    const { like, dislike } = useContext(GlobalContext)
-    const [expanded, setExpanded] = React.useState(false);
-    const [open, setOpen] = React.useState(false);
+    const { like, dislike, commentPost } = useContext(GlobalContext)
+    const [open, setOpen] = useState(false);
     const user = JSON.parse(localStorage.getItem('profile'))?.result?.username
     const isLogin = user === undefined
 
     const handleClickOpen = () => {
+        console.log('enter')
         setOpen(true);
     };
 
     const handleClose = () => {
+        console.log('leave')
         setOpen(false);
     };
 
-
-    const handleExpandClick = () => {
-        setExpanded(!expanded);
-    };
-
-
     const handleLike = async () => {
-        post.likes.push(user);
-        like({ data: post.likes, id: post._id, user });
+        if (post.likes.indexOf(user) == -1) {
+            post.likes.push(user);
+            like({ data: post.likes, id: post._id, user });
+        }
     }
 
     const handleDislike = async () => {
-        post.likes = post.likes.filter(u => u == user);
+        post.likes.splice(post.likes.indexOf(user), 1);
         dislike({ data: post.likes, id: post._id, user });
     }
+
+    const handleComment = (e) => {
+        if (e.charCode === 13 && e.target.value.length > 0) {
+            const cmnt = JSON.stringify({ username: user, comment: e.target.value });
+            post.comments.push(cmnt)
+            commentPost({ data: post.comments, comment: cmnt, id: post._id })
+            e.target.value = ''
+        }
+    };
 
     const Like = () => {
         if (post.likes.length > 0) {
@@ -96,47 +101,61 @@ export const Feeds = ({ post }) => {
                         </Dialog>
                     </>
                 }
-                title={<Typography className={classes.user_dialog} variant='h6'>{post.username}</Typography>}
+                title={<Typography onMouseEnter={handleClickOpen} onMouseLeave={handleClose} className={classes.user_dialog} variant='h6'>{post.username}</Typography>}
                 subheader={post.createdAt}
             />
             <div className={classes.line} />
             <CardMedia
+                onDoubleClick={handleLike}
                 className={classes.media}
                 image={post.file}
                 title="image"
             />
-            <CardActions disableSpacing>
-                <IconButton disabled={isLogin} aria-label="add to favorites">
+            <CardActions>
+                <IconButton disabled={isLogin} size='small'>
                     <Like />
                 </IconButton>
-                <IconButton disabled={isLogin} aria-label="add to favorites">
+                <IconButton disabled={isLogin} size='small'>
                     <ImageSearchIcon onClick={() => history.push(`/post/postView/${post._id}`)} fontSize='large' />
                 </IconButton>
-                <IconButton disabled={isLogin} onClick={() => console.log(window.location.href + `post/postView/${post._id}`)} aria-label="share">
-                    <ShareIcon />
-                </IconButton>
-                <IconButton
-                    className={clsx(classes.expand, {
-                        [classes.expandOpen]: expanded,
-                    })}
-                    onClick={handleExpandClick}
-                    aria-expanded={expanded}
-                    aria-label="show more"
-                >
-                    <ExpandMoreIcon />
+                <IconButton disabled={isLogin} size='small'>
+                    <ShareIcon onClick={() => console.log(window.location.href + `post/postView/${post._id}`)} />
                 </IconButton>
             </CardActions>
-            <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent>
-                    <Typography paragraph>Story: {post.message}</Typography>
-                    <Typography paragraph>Comments:</Typography>
-                </CardContent>
-            </Collapse>
+            <CardContent style={{ marginTop: '-21px' }}>
+                <div>
+                    <Typography color='textPrimary' variant='h6'>{post.likes.length} like{post.likes.length > 1 ? 's' : ''}</Typography>
+                </div>
+                <div>
+                    <Typography className={classes.user_dialog} color='textPrimary' variant='h6'>{post.username}</Typography> &nbsp;{post.message} hello.. my first post
+                </div>
+                <div>
+                    <Typography className={classes.user_dialog} color='textPrimary' variant='inherit'>{post.comments.length > 0 ? (`view all ${post.comments.length} comments`) : ('Be the first to comment')}</Typography>
+                </div>
+                { }
+                {post.comments.length > 0 && (
+                    <div>
+                        <Typography className={classes.user_dialog} color='textPrimary' variant='h6'>
+                            {JSON.parse(post.comments[post.comments.length - 1]).username}
+                        </Typography> &nbsp;
+                        {JSON.parse(post.comments[post.comments.length - 1]).comment}
+                    </div>
+                )}
+                {post.comments.length > 1 && (
+                    <div>
+                        <Typography className={classes.user_dialog} color='textPrimary' variant='h6'>
+                            {JSON.parse(post.comments[post.comments.length - 2]).username}
+                        </Typography> &nbsp;
+                        {JSON.parse(post.comments[post.comments.length - 2]).comment}
+                    </div>
+                )}
+            </CardContent>
             <div className={classes.search}>
                 <InputBase
                     placeholder="Add your comment..."
                     fullWidth
                     inputProps={{ 'aria-label': 'search' }}
+                    onKeyPress={handleComment}
                 />
             </div>
         </Card>

@@ -10,7 +10,7 @@ import { PostView } from './components/postsView/PostView'
 import { ChatBody } from './components/inbox/chatBody/ChatBody'
 
 const App = () => {
-  const user = JSON.parse(localStorage.getItem('profile'))?.result.username;
+  
   return (
     <div style={{ maxWidth: "65rem", margin: "0 auto" }}>
       <GlobalProvider>
