@@ -5,13 +5,11 @@ export const useStyles = makeStyles((theme) => ({
     paper: {
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
+        // alignItems: 'center',
         padding: theme.spacing(2),
     },
     avatar: {
-        width: theme.spacing(11),
-        height: theme.spacing(11),
-        color: theme.palette.getContrastText(deepPurple[500]),
-        backgroundColor: deepPurple[500],
-    },
+        width: theme.spacing(7),
+        height: theme.spacing(7),
+      },
 }));

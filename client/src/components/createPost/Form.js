@@ -5,13 +5,13 @@ import useStyle from "./style";
 import { useHistory } from 'react-router-dom'
 import defaultfile from '../defaultfile.png'
 import { GlobalContext } from '../../context/global/GlobalStates'
+import { Navbar } from "../navbar/Navbar";
 
 export const Form = () => {
     const classes = useStyle()
     const history = useHistory()
     const [postData, setPostData] = useState({ message: '', tags: '', file: '' });
-    const { createPost } = useContext(GlobalContext);
-    const user = JSON.parse(localStorage.getItem('profile'))?.result;
+    const { createPost, user } = useContext(GlobalContext);
 
     useEffect(() => {
 
@@ -19,7 +19,7 @@ export const Form = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        const data = { ...postData, name: user.name, username: user.username }
+        const data = { ...postData, name: user.name, username: user.username, profilePicture: user.profilePicture }
         createPost(data, history);
 
     }
@@ -32,7 +32,7 @@ export const Form = () => {
         return (
             <Paper className={classes.paper}>
                 <Typography variant='h6' align='center'>
-                    Please login to create your own memories and like other's memories
+                    Please login to create your own post and like, comment on other's post
                 </Typography>
             </Paper>
         )

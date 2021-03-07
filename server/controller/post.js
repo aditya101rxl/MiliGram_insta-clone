@@ -16,7 +16,7 @@ export const getPosts = async (req, res) => {
 
 export const createPost = async (req, res) => {
 
-    if (!req.userId) return res.status(404).json("Unauthorized User")
+    if (!req.userId) return res.send("Unauthorized User")
     const postData = req.body;
     const newPost = Post({ ...postData, createdAt: new Date().toISOString() })
     try {

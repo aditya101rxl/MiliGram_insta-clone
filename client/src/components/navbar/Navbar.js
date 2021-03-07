@@ -11,6 +11,7 @@ import { useStyles } from './style';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import { Link, useHistory, useLocation } from 'react-router-dom'
 import logo from '../logo.png'
+import { GlobalContext } from '../../context/global/GlobalStates';
 
 function ElevationScroll(props) {
 
@@ -37,7 +38,7 @@ export const Navbar = (props) => {
     const location = useLocation();
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('profile'))?.result);
+    const { user } = useContext(GlobalContext);
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -65,10 +66,6 @@ export const Navbar = (props) => {
     }
 
     const handleProfileView = () => history.push(`/user/profile/${user?.username}`)
-
-    useEffect(() => {
-        setUser(JSON.parse(localStorage.getItem('profile'))?.result)
-    }, [location])
 
 
     const menuId = 'primary-search-account-menu';
@@ -143,7 +140,6 @@ export const Navbar = (props) => {
                 <div className={classes.grow}>
                     <AppBar color='default'>
                         <Toolbar>
-                            <div className={classes.grow} />
                             <Link to='/'>
                                 <img src={logo} alt='logo' className={classes.logo} />
                             </Link>
@@ -173,24 +169,20 @@ export const Navbar = (props) => {
                                                 component={Link}
                                                 to='/'
                                             >
-                                                <Badge color="secondary">
-                                                    <HomeIcon style={{ fontSize: '35px' }} />
-                                                </Badge>
+                                                <HomeIcon style={{ fontSize: '30px' }} />
                                             </IconButton>
                                             <IconButton aria-label="show 4 new mails" color="inherit" component={Link} to='/user/inbox'>
                                                 <Badge badgeContent={4} color="secondary">
-                                                    <MessageIcon style={{ fontSize: '30px' }} />
+                                                    <MessageIcon style={{ fontSize: '25px' }} />
                                                 </Badge>
                                             </IconButton>
                                             <IconButton aria-label="show 17 new notifications" color="inherit">
                                                 <Badge badgeContent={17} color="secondary">
-                                                    <NotificationsIcon style={{ fontSize: '30px' }} />
+                                                    <NotificationsIcon style={{ fontSize: '25px' }} />
                                                 </Badge>
                                             </IconButton>
                                             <IconButton aria-label="show 4 new mails" color="inherit" onClick={handleProfileView}>
-                                                <Badge color="secondary">
-                                                    <Avatar className={classes.avatar} alt={user?.name} src={user?.profilePicture} />
-                                                </Badge>
+                                                <Avatar alt={user?.name} src={user?.profilePicture} />
                                             </IconButton>
                                         </div>
                                         <Button variant='outlined' color="secondary" onClick={logout}>logout</Button>
@@ -207,8 +199,8 @@ export const Navbar = (props) => {
                                         </div>
                                     </>
                                 ) : (
-                                        <Button component={Link} to="/user/auth" variant='outlined' color='primary' >Sing In</Button>
-                                    )
+                                    <Button component={Link} to="/user/auth" variant='outlined' color='primary' >Sing In</Button>
+                                )
                             }
 
                         </Toolbar>

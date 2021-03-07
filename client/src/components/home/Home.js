@@ -5,6 +5,7 @@ import { Profile } from './profile/Profile'
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { makeStyles } from '@material-ui/core/styles';
 import { GlobalContext } from '../../context/global/GlobalStates'
+import { Navbar } from '../navbar/Navbar';
 
 const useStyles = makeStyles((theme) => ({
     sectionMobile: {
@@ -33,8 +34,8 @@ export const Home = () => {
                     {posts.length ? (
                         posts.map(post => <Feeds post={post} />)
                     ) : (
-                            <LinearProgress color="secondary" />
-                        )}
+                        <LinearProgress color="secondary" />
+                    )}
                 </Box>
             </Grid>
             <Grid item xs={12} sm={4} className={classes.sectionMobile}>

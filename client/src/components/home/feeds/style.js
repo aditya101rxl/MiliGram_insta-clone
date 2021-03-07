@@ -61,5 +61,12 @@ export const useStyles = makeStyles((theme) => ({
         '&:hover': {
             cursor: 'pointer',
         }
-    }
+    },
+    commentDialog: {
+        width: '100%',
+    },
+    head: {
+        display: 'flex',
+        justifyContent: 'space-between',
+    },
 }));

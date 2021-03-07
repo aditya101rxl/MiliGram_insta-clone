@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import FileBase from 'react-file-base64'
 import Grid from '@material-ui/core/Grid';
 import * as api from '../../../api'
 import { Button, TextField } from '@material-ui/core';
 import { useStyles } from './style';
+import { GlobalContext } from '../../../context/global/GlobalStates';
 
-export const EditProfile = ({ user, setUser, setEdit }) => {
+export const EditProfile = ({ user, setEdit }) => {
     const classes = useStyles();
-
+    const { editUser } = useContext(GlobalContext)
     const [changes, setChanges] = useState({ name: user.name, email: user.email, status: user.status, profilePicture: user.profilePicture })
 
     const handleChanges = async (e) => {
         e.preventDefault()
         const { data } = await api.updateProfile(user._id, changes)
-        console.log(data);
+        editUser(data);
         setEdit(prev => !prev)
-        setUser(data);
     }
 
     return (
@@ -69,9 +69,9 @@ export const EditProfile = ({ user, setUser, setEdit }) => {
                             />
                         </Grid>
                         <Button
-                            disabled={(user._id) !== (JSON.parse(localStorage.getItem('profile'))?.result?._id)}
+                            disabled={(user.username) !== (JSON.parse(localStorage.getItem('profile'))?.username)}
                             variant='contained'
-                            color='inherit'
+                            color='primary'
                             fullWidth
                             type='submit'
                             onClick={handleChanges}
@@ -79,9 +79,9 @@ export const EditProfile = ({ user, setUser, setEdit }) => {
                             &nbsp;Save Changes
                         </Button>
                         <Button
-                            disabled={(user._id) !== (JSON.parse(localStorage.getItem('profile'))?.result?._id)}
+                            disabled={(user.username) !== (JSON.parse(localStorage.getItem('profile'))?.username)}
                             variant='contained'
-                            color='inherit'
+                            color='secondary'
                             fullWidth
                             onClick={() => setEdit(prev => !prev)}
                             className={classes.margin}>

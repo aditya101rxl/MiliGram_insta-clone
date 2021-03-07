@@ -5,6 +5,7 @@ const postSchema = mongoose.Schema({
     username: String,
     message: String,
     file: String,
+    profilePicture: String,
     tags: {
         type: [String],
         default: []

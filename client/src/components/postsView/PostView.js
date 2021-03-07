@@ -16,6 +16,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { useStyles } from './style'
 import shirley from '../default.jpg'
+import { Navbar } from '../navbar/Navbar';
 
 export const PostView = () => {
     const classes = useStyles();

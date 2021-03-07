@@ -5,7 +5,8 @@ import socketio from 'socket.io-client';
 
 
 const initialState = {
-    posts: []
+    posts: [],
+    user: null
 }
 
 export const GlobalContext = createContext(initialState)
@@ -13,8 +14,7 @@ export const GlobalContext = createContext(initialState)
 export const GlobalProvider = ({ children }) => {
 
     const [state, dispatch] = useReducer(GlobalReducer, initialState);
-    const user = JSON.parse(localStorage.getItem('profile'))?.result
-    console.log(user);
+    console.log(state.user);
 
     // Authorization actions
     const signin = async (formData, history) => {
@@ -74,16 +74,25 @@ export const GlobalProvider = ({ children }) => {
     const commentPost = ({ data, comment, id }) => {
         api.comment({ _id: id, comment });
         dispatch({ type: 'COMMENT', payload: { id, data } });
-        console.log(comment, id);
+    }
+
+    const editUser = (data) => {
+        dispatch({ type: 'USER', payload: data });
     }
 
     // socket connection if user exist
     useEffect(() => {
         console.log('user changed..');
-    }, [user])
+    }, [state.user])
 
     useEffect(() => {
         getPosts();
+        const username = JSON.parse(localStorage.getItem('profile'))?.username
+        if (username != undefined) {
+            api.findUser(username).then(user => {
+                dispatch({ type: 'USER', payload: user.data });
+            })
+        }
     }, [])
 
     return (
@@ -98,6 +107,7 @@ export const GlobalProvider = ({ children }) => {
             like,
             dislike,
             commentPost,
+            editUser,
         }}>
             {children}
         </GlobalContext.Provider>

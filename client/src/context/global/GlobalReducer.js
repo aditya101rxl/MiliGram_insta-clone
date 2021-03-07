@@ -6,11 +6,13 @@ export default (state, action) => {
             return { ...state, posts: [action.payload, ...state.posts] }
         case 'SIGNIN':
         case 'SIGNUP':
-            localStorage.setItem('profile', JSON.stringify({ ...action.payload }));
-            return { ...state, user: action.payload }
+            localStorage.setItem('profile', JSON.stringify({ token: action.payload.token, username: action.payload.user.username }));
+            return { ...state, user: { ...action.payload.user, password: null } }
         case 'LOGOUT':
             localStorage.clear();
             return { ...state, user: action.payload }
+        case 'USER':
+            return { ...state, user: { ...action.payload, password: null } };
         case 'LIKE':
         case 'DISLIKE':
             return {

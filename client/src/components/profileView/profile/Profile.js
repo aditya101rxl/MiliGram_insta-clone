@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Paper, GridList, GridListTile, GridListTileBar, Typography, Button, Grid, IconButton } from '@material-ui/core'
 import HomeIcon from '@material-ui/icons/Home'
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
@@ -9,6 +9,8 @@ import { useStyles } from './style';
 import { Link, useHistory, useParams, useLocation } from 'react-router-dom'
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { EditProfile } from '../edit/EditProfile';
+import { Navbar } from '../../navbar/Navbar';
+import { GlobalContext } from '../../../context/global/GlobalStates';
 
 
 export const Profile = () => {
@@ -18,27 +20,23 @@ export const Profile = () => {
     const params = useParams()
     const username = params.username;
 
-    const [user, setUser] = useState(0);
+    const [userFound, setUserFound] = useState(0);
     const [edit, setEdit] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false);
-    const existingUser = JSON.parse(localStorage.getItem('profile'))?.result;
+    const { user } = useContext(GlobalContext)
 
     useEffect(async () => {
-        try {
-            const { data } = await api.findUser(username);
-            setUser(data);
-        } catch (error) {
-            console.log(error);
-        }
-    }, [isFollowing, location])
+        const { data } = await api.findUser(username);
+        setUserFound(data);
+    }, [isFollowing, location, user])
 
 
     const handleFollow = async () => {
-        const { data } = await api.follow({ username1: existingUser?.username, username2: user?.username, isFollow: true })
+        const { data } = await api.follow({ username1: user?.username, username2: userFound?.username, isFollow: true })
         if (data.message === 'successed') { setIsFollowing(prev => !prev); }
     }
     const handleUnfollow = async () => {
-        const { data } = await api.follow({ username1: existingUser?.username, username2: user?.username, isFollow: false });
+        const { data } = await api.follow({ username1: user?.username, username2: userFound?.username, isFollow: false });
         if (data.message === 'successed') { setIsFollowing(prev => !prev); }
     }
 
@@ -48,7 +46,7 @@ export const Profile = () => {
 
     const Follow = () => {
         console.log('redendering..');
-        return user.followers.find(username => (isFollowing || username === existingUser?.username)) ? (
+        return userFound.followers.find(username => (isFollowing || username === user?.username)) ? (
             <Button
                 fullWidth
                 variant="outlined"
@@ -58,27 +56,28 @@ export const Profile = () => {
                 Unfollow
             </Button>
         ) : (
-                <Button
-                    fullWidth
-                    variant="outlined"
-                    color="secondary"
-                    onClick={handleFollow}
-                    className={classes.margin}>
-                    Follow
-                </Button>
-            )
+            <Button
+                fullWidth
+                variant="outlined"
+                color="secondary"
+                onClick={handleFollow}
+                className={classes.margin}>
+                Follow
+            </Button>
+        )
     }
 
 
-    if (user === 0) {
+    if (userFound === 0) {
         return (
             <LinearProgress color="secondary" />
+
         )
     }
 
     if (edit) {
         return (
-            <EditProfile user={user} setUser={setUser} setEdit={setEdit} />
+            <EditProfile user={user} setEdit={setEdit} />
         )
     }
 
@@ -86,14 +85,14 @@ export const Profile = () => {
         <Paper className={classes.paper} style={{ maxWidth: "auto", margin: "0 auto" }}>
             <Typography style={{ margin: "0 auto" }} variant='overline'>Profile</Typography>
             {
-                user ? (
+                userFound ? (
                     <div className={classes.root}>
                         <Grid container spacing={1}>
                             <Grid item xs={12} sm={4}>
                                 <div className={classes.header}>
-                                    <img className={classes.image} src={user?.profilePicture} alt={user?.name} />
+                                    <img className={classes.image} src={userFound?.profilePicture} alt={userFound?.name} />
                                     <Button
-                                        disabled={(user._id) !== (JSON.parse(localStorage.getItem('profile'))?.result?._id)}
+                                        disabled={(userFound?._id) !== (user?._id)}
                                         variant="outlined"
                                         color="secondary"
                                         fullWidth
@@ -105,31 +104,31 @@ export const Profile = () => {
                             </Grid>
                             <Grid item xs={12} sm={8}>
                                 <div className={classes.header}>
-                                    <Typography variant='h6'>{user.name} - (username : {user.username})</Typography>
-                                    <Typography color='secondary' variant='overline'>status: {user.status}</Typography>
+                                    <Typography variant='h6'>{userFound.name} - (username : {userFound.username})</Typography>
+                                    <Typography color='secondary' variant='overline'>status: {userFound.status}</Typography>
                                 </div>
                                 <Grid container spacing={1}>
                                     <Grid item xs>
                                         <div className={classes.header}>
-                                            <Typography variant='h6'>{user.posts.length}</Typography>
+                                            <Typography variant='h6'>{userFound.posts.length}</Typography>
                                             <Typography variant='overline'>posts</Typography>
                                         </div>
                                     </Grid>
                                     <Grid item xs>
                                         <div className={classes.header}>
-                                            <Typography variant='h6'>{user.followers.length}</Typography>
+                                            <Typography variant='h6'>{userFound.followers.length}</Typography>
                                             <Typography variant='overline'>followers</Typography>
                                         </div>
                                     </Grid>
                                     <Grid item xs>
                                         <div className={classes.header}>
-                                            <Typography variant='h6'>{user.following.length}</Typography>
+                                            <Typography variant='h6'>{userFound.following.length}</Typography>
                                             <Typography variant='overline'>following</Typography>
                                         </div>
                                     </Grid>
                                 </Grid>
                                 <div className={classes.header}>
-                                    {existingUser && (user?._id) !== (existingUser?._id) ? <Follow /> : (
+                                    {user && (userFound?._id) !== (user?._id) ? <Follow /> : (
                                         <Button
                                             fullWidth
                                             disabled
@@ -139,7 +138,7 @@ export const Profile = () => {
                                             Follow
                                         </Button>
                                     )}
-                                    {(user._id) === (existingUser?._id) ? (
+                                    {(userFound._id) === (user?._id) ? (
                                         <Button
                                             fullWidth
                                             variant="outlined"
@@ -149,23 +148,23 @@ export const Profile = () => {
                                             Create New Post
                                         </Button>
                                     ) : (
-                                            <Button
-                                                fullWidth
-                                                variant="outlined"
-                                                color='primary'
-                                                onClick={()=> history.push('/user/inbox')}
-                                                className={classes.margin}>
-                                                Message
-                                            </Button>
-                                        )}
+                                        <Button
+                                            fullWidth
+                                            variant="outlined"
+                                            color='primary'
+                                            onClick={() => history.push('/user/inbox')}
+                                            className={classes.margin}>
+                                            Message
+                                        </Button>
+                                    )}
                                 </div>
 
                             </Grid>
                         </Grid>
                         <div className={classes.root1}>
-                            {user.posts.length === 0 && (<Typography variant='overline' style={{ margin: '35%' }}>No Posts</Typography>)}
+                            {userFound.posts.length === 0 && (<Typography variant='overline' style={{ margin: '35%' }}>No Posts</Typography>)}
                             <GridList cellHeight={600} >
-                                {user.posts.map((tile) => (
+                                {userFound.posts.map((tile) => (
                                     <GridListTile key={tile._id}>
                                         <img src={tile.file} alt={tile.username} />
                                         <GridListTileBar
@@ -183,21 +182,21 @@ export const Profile = () => {
                         </div>
                     </div>
                 ) : (
-                        <Paper className={classes.paper}>
-                            <ErrorOutlineIcon style={{ fontSize: 80 }} />
-                            <Typography variant='h4'>No User found with given username: {username}</Typography>
-                            <IconButton
-                                edge="start"
-                                className={classes.menuButton}
-                                color="inherit"
-                                aria-label="open drawer"
-                                component={Link}
-                                to='/'
-                            >
-                                <HomeIcon style={{ fontSize: 40 }} />
-                            </IconButton>
-                        </Paper>
-                    )
+                    <Paper className={classes.paper}>
+                        <ErrorOutlineIcon style={{ fontSize: 80 }} />
+                        <Typography variant='h4'>No User found with given username: {username}</Typography>
+                        <IconButton
+                            edge="start"
+                            className={classes.menuButton}
+                            color="inherit"
+                            aria-label="open drawer"
+                            component={Link}
+                            to='/'
+                        >
+                            <HomeIcon style={{ fontSize: 40 }} />
+                        </IconButton>
+                    </Paper>
+                )
             }
         </Paper >
     )
