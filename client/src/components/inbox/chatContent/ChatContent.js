@@ -1,153 +1,125 @@
-import React, { Component, useState, createRef, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
+import SendIcon from '@material-ui/icons/Send';
+import ImageIcon from '@material-ui/icons/Image';
+import SettingsIcon from '@material-ui/icons/Settings';
+import * as api from '../../../api'
 
 import "./chatContent.css";
 import { Avatar } from "../chatList/Avatar";
-import ChatItem from "./ChatItem";
+import { ChatItem } from "./ChatItem";
+import { ChatContext } from "../../../context/local/ChatStates";
+import { GlobalContext } from "../../../context/global/GlobalStates";
 
-export default class ChatContent extends Component {
-    messagesEndRef = createRef(null);
-    chatItms = [
-        {
-            key: 1,
-            image:
-                "https://pbs.twimg.com/profile_images/1116431270697766912/-NfnQHvh_400x400.jpg",
-            type: "",
-            msg: "Hi Tim, How are you?",
-        },
-        {
-            key: 2,
-            image:
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTA78Na63ws7B7EAWYgTr9BxhX_Z8oLa1nvOA&usqp=CAU",
-            type: "other",
-            msg: "I am fine.",
-        },
-        {
-            key: 3,
-            image:
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTA78Na63ws7B7EAWYgTr9BxhX_Z8oLa1nvOA&usqp=CAU",
-            type: "other",
-            msg: "What about you?",
-        },
-        {
-            key: 4,
-            image:
-                "https://pbs.twimg.com/profile_images/1116431270697766912/-NfnQHvh_400x400.jpg",
-            type: "",
-            msg: "Awesome these days.",
-        },
-        {
-            key: 5,
-            image:
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTA78Na63ws7B7EAWYgTr9BxhX_Z8oLa1nvOA&usqp=CAU",
-            type: "other",
-            msg: "Finally. What's the plan?",
-        },
-        {
-            key: 6,
-            image:
-                "https://pbs.twimg.com/profile_images/1116431270697766912/-NfnQHvh_400x400.jpg",
-            type: "",
-            msg: "what plan mate?",
-        },
-        {
-            key: 7,
-            image:
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTA78Na63ws7B7EAWYgTr9BxhX_Z8oLa1nvOA&usqp=CAU",
-            type: "other",
-            msg: "I'm taliking about the tutorial",
-        },
-    ];
+export const ChatContent = () => {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            chat: this.chatItms,
-            msg: "",
-        };
-    }
+    const messagesEndRef = useRef(null);
+    const { activeChat } = useContext(ChatContext);
+    const { user } = useContext(GlobalContext)
+    const [msg, setMsg] = useState("");
+    const user1 = activeChat?.user1?.username === user?.username ? activeChat?.user1 : activeChat?.user2;
+    const user2 = activeChat?.user1?.username === user1?.username ? activeChat?.user2 : activeChat?.user1;
 
-    scrollToBottom = () => {
-        this.messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    const scrollToBottom = () => {
+        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     };
 
-    componentDidMount() {
-        window.addEventListener("keydown", (e) => {
-            if (e.keyCode == 13) {
-                if (this.state.msg != "") {
-                    this.chatItms.push({
-                        key: 1,
-                        type: "",
-                        msg: this.state.msg,
-                        image:
-                            "https://pbs.twimg.com/profile_images/1116431270697766912/-NfnQHvh_400x400.jpg",
-                    });
-                    this.setState({ chat: [...this.chatItms] });
-                    this.scrollToBottom();
-                    this.setState({ msg: "" });
-                }
-            }
-        });
-        this.scrollToBottom();
+    const getTime = () => {
+        var today = new Date();
+        var time = today.getHours() + ':' + today.getMinutes()
+        return time;
     }
-    onStateChange = (e) => {
-        this.setState({ msg: e.target.value });
-    };
 
-    render() {
+    useEffect(() => {
+        if (messagesEndRef.current != null)
+            scrollToBottom();
+    }, [msg])
+
+    const handleSendMsgClick = (e) => {
+        if (msg != "") {
+            const stringifiedMsg = JSON.stringify({ user: user1.username, msg: { m: msg, time: getTime() } })
+            // api call
+            api.sendMsg({ _id: activeChat?._id, msg: stringifiedMsg });
+            activeChat.message.push(stringifiedMsg)
+            scrollToBottom();
+            setMsg("");
+        }
+    }
+
+    const handleSendMsg = (e) => {
+        if (e.charCode === 13 && msg != "") {
+            const stringifiedMsg = JSON.stringify({ user: user1.username, msg: { m: msg, time: getTime() } })
+            // api call
+            api.sendMsg({ _id: activeChat?._id, msg: stringifiedMsg });
+            activeChat.message.push(stringifiedMsg)
+            scrollToBottom();
+            setMsg("");
+        }
+    }
+
+    if (activeChat == null) {
         return (
-            <div className="main__chatcontent">
-                <div className="content__header">
-                    <div className="blocks">
-                        <div className="current-chatting-user">
-                            <Avatar
-                                isOnline="active"
-                                image="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTA78Na63ws7B7EAWYgTr9BxhX_Z8oLa1nvOA&usqp=CAU"
-                            />
-                            <p>Tim Hover</p>
-                        </div>
-                    </div>
+            <div>
+                Please select any one to chat
+            </div>
+        )
+    }
 
-                    <div className="blocks">
-                        <div className="settings">
-                            <button className="btn-nobg">
-                                <i className="fa fa-cog"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div className="content__body">
-                    <div className="chat__items">
-                        {this.state.chat.map((itm, index) => {
-                            return (
-                                <ChatItem
-                                    animationDelay={index + 2}
-                                    key={itm.key}
-                                    user={itm.type ? itm.type : "me"}
-                                    msg={itm.msg}
-                                    image={itm.image}
-                                />
-                            );
-                        })}
-                        <div ref={this.messagesEndRef} />
-                    </div>
-                </div>
-                <div className="content__footer">
-                    <div className="sendNewMessage">
-                        <button className="addFiles">
-                            <i className="fa fa-plus"></i>
-                        </button>
-                        <input
-                            type="text"
-                            placeholder="Type a message here"
-                            onChange={this.onStateChange}
-                            value={this.state.msg}
+    return (
+        <div className="main__chatcontent">
+            <div className="content__header">
+                <div className="blocks">
+                    <div className="current-chatting-user">
+                        <Avatar
+                            isOnline="active"
+                            image={user2.profilePicture}
                         />
-                        <button className="btnSendMsg" id="sendMsgBtn">
-                            <i className="fa fa-paper-plane"></i>
+                        <p>{user2.username}</p>
+                    </div>
+                </div>
+
+                <div className="blocks">
+                    <div className="settings">
+                        <button className="btn-nobg">
+                            <SettingsIcon />
                         </button>
                     </div>
                 </div>
             </div>
-        );
-    }
+            <div className="content__body">
+                <div className="chat__items">
+                    {activeChat.message.map((itm, index) => {
+                        const item = JSON.parse(itm);
+                        return (
+                            <ChatItem
+                                animationDelay={index + 1}
+                                key={index + 1}
+                                user={item.user === user1.username ? "me" : "other"}
+                                msg={item.msg}
+                                image={item.user === user1.username ? user1.profilePicture : user2.profilePicture}
+                            />
+                        );
+                    })}
+                    <div ref={messagesEndRef} />
+                </div>
+            </div>
+            <div className="content__footer">
+                <div className="sendNewMessage">
+                    <button className="addFiles">
+                        <ImageIcon />
+                    </button>
+                    <input
+                        autoFocus
+                        type="text"
+                        placeholder="Type a message here"
+                        onChange={(e) => setMsg(e.target.value)}
+                        value={msg}
+                        onKeyPress={handleSendMsg}
+                    />
+                    <button className="btnSendMsg" id="sendMsgBtn" onClick={handleSendMsgClick}>
+                        <SendIcon />
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 }

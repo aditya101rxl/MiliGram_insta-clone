@@ -14,7 +14,6 @@ export const GlobalContext = createContext(initialState)
 export const GlobalProvider = ({ children }) => {
 
     const [state, dispatch] = useReducer(GlobalReducer, initialState);
-    console.log(state.user);
 
     // Authorization actions
     const signin = async (formData, history) => {

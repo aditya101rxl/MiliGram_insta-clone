@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { Paper, Typography } from '@material-ui/core'
 import { ChatList } from "../chatList/ChatList";
-import ChatContent from "../chatContent/ChatContent";
+import { ChatContent } from "../chatContent/ChatContent";
 import UserProfile from "../userProfile/UserProfile";
 import { GlobalContext } from "../../../context/global/GlobalStates";
 import "./chatBody.css";

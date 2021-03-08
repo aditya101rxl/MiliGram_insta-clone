@@ -1,11 +1,16 @@
-import React, { Component } from "react";
+import React, { useContext } from "react";
 import "./chatList.css";
 import { ChatListItems } from "./ChatListItems";
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import SearchIcon from '@material-ui/icons/Search';
+import { GlobalContext } from "../../../context/global/GlobalStates";
+import { ChatContext } from "../../../context/local/ChatStates";
 
 export const ChatList = () => {
+
+    const { user } = useContext(GlobalContext);
+    const { chatList } = useContext(ChatContext);
     const allChatUsers = [
         {
             image:
@@ -107,15 +112,25 @@ export const ChatList = () => {
                 </div>
             </div>
             <div className="chatlist__items">
-                {allChatUsers.map((item, index) => {
+                {/* {allChatUsers.map((item, index) => { */}
+                {chatList.map((item, index) => {
                     return (
                         <ChatListItems
-                            name={item.name}
-                            key={item.id}
-                            animationDelay={index + 1}
-                            active={item.active ? "active" : ""}
-                            isOnline={item.isOnline ? "active" : ""}
-                            image={item.image}
+                            name={
+                                item?.user1?.username == user?.username ?
+                                    item?.user2.username :
+                                    item?.user1.username
+                            }
+                            id={item?._id}
+                            key={item?._id}
+                            animationDelay={index + 0.5}
+                            active={false ? "active" : ""}
+                            isOnline={true ? "active" : ""}
+                            image={
+                                item?.user1?.username == user?.username ?
+                                    item?.user2?.profilePicture :
+                                    item?.user1?.profilePicture
+                            }
                         />
                     );
                 })}

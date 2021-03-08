@@ -163,7 +163,7 @@ export const Feeds = ({ post }) => {
                     <Typography color='textPrimary' variant='h6'>{post.likes.length} like{post.likes.length > 1 ? 's' : ''}</Typography>
                 </div>
                 <div>
-                    <Typography className={classes.user_dialog} color='textPrimary' variant='h6'>{post.username}</Typography> &nbsp;{post.message} hello.. my first post
+                    <Typography className={classes.user_dialog} color='textPrimary' variant='h6'>{post.username}</Typography> &nbsp;{post.message}
                 </div>
                 <div>
                     <Typography
