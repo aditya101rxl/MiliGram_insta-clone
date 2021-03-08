@@ -14,7 +14,11 @@ export const signin = (signinData) => API.post('/user/signin', signinData);
 export const signup = (signupData) => API.post('/user/signup', signupData);
 export const findUser = (username) => API.get(`/user/profile/${username}`);
 export const updateProfile = (id, data) => API.patch(`/user/profile/update/${id}`, data);
-export const follow = (data) => API.patch(`/user/follow`, data);
+
+
+export const followRequest = (data) => API.patch(`/user/follow/sendRequest`, data);
+export const confirmFollowRequest = (data) => API.patch(`/user/follow/confirmRequest`, data);
+export const cancelFollowRequest = (data) => API.patch(`/user/follow/cancelRequest`, data);
 
 
 export const getPosts = () => API.get('/post');

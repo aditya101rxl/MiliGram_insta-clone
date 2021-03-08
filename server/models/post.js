@@ -10,10 +10,6 @@ const postSchema = mongoose.Schema({
         type: [String],
         default: []
     },
-    createdAt: {
-        type: Date,
-        default: new Date()
-    },
     likes: {
         type: [String],
         default: []
@@ -22,7 +18,7 @@ const postSchema = mongoose.Schema({
         type: [String],
         default: []
     }
-})
+}, { timestamps: true })
 
 const Post = mongoose.model('Post', postSchema);
 

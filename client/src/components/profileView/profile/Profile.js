@@ -9,8 +9,10 @@ import { useStyles } from './style';
 import { Link, useHistory, useParams, useLocation } from 'react-router-dom'
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { EditProfile } from '../edit/EditProfile';
-import { Navbar } from '../../navbar/Navbar';
 import { GlobalContext } from '../../../context/global/GlobalStates';
+import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
+import SendIcon from '@material-ui/icons/Send';
+import { Follow } from '../Follow'
 
 
 export const Profile = () => {
@@ -22,56 +24,33 @@ export const Profile = () => {
 
     const [userFound, setUserFound] = useState(0);
     const [edit, setEdit] = useState(false);
-    const [isFollowing, setIsFollowing] = useState(false);
-    const { user } = useContext(GlobalContext)
+    const [userPosts, setUserPosts] = useState([]);
+    const { user, posts } = useContext(GlobalContext)
 
     useEffect(async () => {
         const { data } = await api.findUser(username);
+        console.log(data);
+        console.log(user);
         setUserFound(data);
-    }, [isFollowing, location, user])
+    }, [location])
 
-
-    const handleFollow = async () => {
-        const { data } = await api.follow({ username1: user?.username, username2: userFound?.username, isFollow: true })
-        if (data.message === 'successed') { setIsFollowing(prev => !prev); }
-    }
-    const handleUnfollow = async () => {
-        const { data } = await api.follow({ username1: user?.username, username2: userFound?.username, isFollow: false });
-        if (data.message === 'successed') { setIsFollowing(prev => !prev); }
-    }
+    useEffect(() => {
+        var userposts = [];
+        for (let index = 0; index < posts.length; index++) {
+            const element = posts[index];
+            if (element.username == userFound?.username) {
+                userposts.push(element);
+            }
+        }
+        setUserPosts(userposts);
+    }, [userFound])
 
     const handleCreatePost = () => history.push('/post/createPost');
     const handleEdit = () => setEdit(prev => !prev)
 
-
-    const Follow = () => {
-        console.log('redendering..');
-        return userFound.followers.find(username => (isFollowing || username === user?.username)) ? (
-            <Button
-                fullWidth
-                variant="outlined"
-                color="secondary"
-                onClick={handleUnfollow}
-                className={classes.margin}>
-                Unfollow
-            </Button>
-        ) : (
-            <Button
-                fullWidth
-                variant="outlined"
-                color="secondary"
-                onClick={handleFollow}
-                className={classes.margin}>
-                Follow
-            </Button>
-        )
-    }
-
-
     if (userFound === 0) {
         return (
             <LinearProgress color="secondary" />
-
         )
     }
 
@@ -110,7 +89,7 @@ export const Profile = () => {
                                 <Grid container spacing={1}>
                                     <Grid item xs>
                                         <div className={classes.header}>
-                                            <Typography variant='h6'>{userFound.posts.length}</Typography>
+                                            <Typography variant='h6'>{userPosts.length}</Typography>
                                             <Typography variant='overline'>posts</Typography>
                                         </div>
                                     </Grid>
@@ -128,43 +107,39 @@ export const Profile = () => {
                                     </Grid>
                                 </Grid>
                                 <div className={classes.header}>
-                                    {user && (userFound?._id) !== (user?._id) ? <Follow /> : (
-                                        <Button
-                                            fullWidth
-                                            disabled
-                                            variant="outlined"
-                                            color="secondary"
-                                            className={classes.margin}>
-                                            Follow
-                                        </Button>
-                                    )}
-                                    {(userFound._id) === (user?._id) ? (
+                                    {(userFound?._id) != (user?._id) && <Follow
+                                        username={userFound?.username} profilePicture={userFound?.profilePicture}
+                                    />}
+                                    {(userFound._id) === (user?._id) && (
                                         <Button
                                             fullWidth
                                             variant="outlined"
                                             color='primary'
                                             onClick={handleCreatePost}
                                             className={classes.margin}>
-                                            Create New Post
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            fullWidth
-                                            variant="outlined"
-                                            color='primary'
-                                            onClick={() => history.push('/user/inbox')}
-                                            className={classes.margin}>
-                                            Message
+                                            Create New Post &nbsp; &nbsp;
+                                            <AddAPhotoIcon />
                                         </Button>
                                     )}
+                                    {((user?.followers.indexOf(userFound?.username) != -1) ||
+                                        (user?.following.indexOf(userFound?.username) != -1)) && (
+                                            <Button
+                                                fullWidth
+                                                variant="outlined"
+                                                color='primary'
+                                                onClick={() => history.push('/user/inbox')}
+                                                className={classes.margin}>
+                                                Message &nbsp; &nbsp;
+                                                <SendIcon />
+                                            </Button>
+                                        )}
                                 </div>
-
                             </Grid>
                         </Grid>
                         <div className={classes.root1}>
-                            {userFound.posts.length === 0 && (<Typography variant='overline' style={{ margin: '35%' }}>No Posts</Typography>)}
+                            {userPosts.length === 0 && (<Typography variant='overline' style={{ margin: '35%' }}>No Posts</Typography>)}
                             <GridList cellHeight={600} >
-                                {userFound.posts.map((tile) => (
+                                {userPosts.map((tile) => (
                                     <GridListTile key={tile._id}>
                                         <img src={tile.file} alt={tile.username} />
                                         <GridListTileBar

@@ -7,3 +7,8 @@
     display: flex;
     flex-wrap: wrap;
   }
+
+.paper {
+    padding: 15px;
+    text-align: center;
+}
