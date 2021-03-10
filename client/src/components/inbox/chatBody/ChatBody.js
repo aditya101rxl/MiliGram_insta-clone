@@ -23,6 +23,7 @@ export const ChatBody = () => {
         )
     }
 
+    console.log('rendering.......');
     return (
         <div className="main__chatbody">
             <ChatProvider>

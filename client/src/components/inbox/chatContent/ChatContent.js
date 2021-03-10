@@ -13,34 +13,48 @@ import { GlobalContext } from "../../../context/global/GlobalStates";
 export const ChatContent = () => {
 
     const messagesEndRef = useRef(null);
-    const { activeChat } = useContext(ChatContext);
-    const { user } = useContext(GlobalContext)
+    const { activeChat} = useContext(ChatContext);
+    const { user, socket } = useContext(GlobalContext)
     const [msg, setMsg] = useState("");
     const user1 = activeChat?.user1?.username === user?.username ? activeChat?.user1 : activeChat?.user2;
     const user2 = activeChat?.user1?.username === user1?.username ? activeChat?.user2 : activeChat?.user1;
+    const [allMsg, setAllMsg] = useState([]);
 
     const scrollToBottom = () => {
         messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     };
-
     const getTime = () => {
         var today = new Date();
         var time = today.getHours() + ':' + today.getMinutes()
         return time;
     }
-
     useEffect(() => {
         if (messagesEndRef.current != null)
             scrollToBottom();
-    }, [msg])
+    }, [allMsg])
+    useEffect(() => {
+        if (activeChat !== null)
+            setAllMsg(activeChat?.message);
+    }, [activeChat])
+
+    const addMsg = (msg) => {
+        setAllMsg([...allMsg, msg]);
+    }
+
+    useEffect(() => {
+        if (socket == null) return;
+        socket.on('receive', ({ msg }) => {
+            addMsg(msg);
+        })
+    }, [socket, allMsg])
 
     const handleSendMsgClick = (e) => {
         if (msg != "") {
             const stringifiedMsg = JSON.stringify({ user: user1.username, msg: { m: msg, time: getTime() } })
             // api call
             api.sendMsg({ _id: activeChat?._id, msg: stringifiedMsg });
-            activeChat.message.push(stringifiedMsg)
-            scrollToBottom();
+            socket.emit('send', { to: user2.username, msg: stringifiedMsg })
+            addMsg(stringifiedMsg);
             setMsg("");
         }
     }
@@ -50,10 +64,14 @@ export const ChatContent = () => {
             const stringifiedMsg = JSON.stringify({ user: user1.username, msg: { m: msg, time: getTime() } })
             // api call
             api.sendMsg({ _id: activeChat?._id, msg: stringifiedMsg });
-            activeChat.message.push(stringifiedMsg)
-            scrollToBottom();
+            socket.emit('send', { to: user2.username, msg: stringifiedMsg })
+            addMsg(stringifiedMsg);
             setMsg("");
         }
+    }
+
+    const handleEmoji = (e) => {
+        console.log('handle emoji click');
     }
 
     if (activeChat == null) {
@@ -87,7 +105,7 @@ export const ChatContent = () => {
             </div>
             <div className="content__body">
                 <div className="chat__items">
-                    {activeChat.message.map((itm, index) => {
+                    {allMsg.map((itm, index) => {
                         const item = JSON.parse(itm);
                         return (
                             <ChatItem
@@ -104,7 +122,7 @@ export const ChatContent = () => {
             </div>
             <div className="content__footer">
                 <div className="sendNewMessage">
-                    <button className="addFiles">
+                    <button className="addFiles" onClick={handleEmoji}>
                         <ImageIcon />
                     </button>
                     <input

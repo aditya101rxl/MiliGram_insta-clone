@@ -1,14 +1,12 @@
 import React, { useEffect, useState, useContext } from 'react';
 
 import moment from 'moment'
-import { Paper, Card, CardHeader, CardMedia, CardContent, CardActions, TextField, InputBase } from '@material-ui/core'
-import { Avatar, DialogTitle, DialogContent, DialogActions } from '@material-ui/core';
+import { Paper, Card, CardHeader, CardMedia, CardContent, CardActions, Avatar, InputBase } from '@material-ui/core'
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
-import CloseIcon from '@material-ui/icons/Close';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import ImageSearchIcon from '@material-ui/icons/ImageSearch';
 import { useStyles } from './style'
@@ -16,31 +14,25 @@ import { useHistory } from 'react-router-dom'
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import { GlobalContext } from '../../../context/global/GlobalStates';
+import { CommentDialogBox } from './CommentDialogBox';
+import Slide from '@material-ui/core/Slide';
+import { DialogTitle, DialogContent, DialogActions, DialogContentText } from '@material-ui/core';
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export const Feeds = ({ post }) => {
     const classes = useStyles();
     const history = useHistory();
-    const { user, like, dislike, commentPost } = useContext(GlobalContext)
-    const [open, setOpen] = useState(false);
-    const [commentDialog, setCommentDialog] = useState(false);
+    const { user, like, dislike, commentPost, deletePost } = useContext(GlobalContext)
+    const [openComment, setOpenComment] = useState(false);
+    const [openDelete, setOpenDelete] = useState(false);
+    const [openMore, setOpenMore] = useState(false);
     const isLogin = user === null
 
-    const handleClickOpen = () => {
-        console.log('enter')
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        console.log('leave')
-        setOpen(false);
-    };
-
-    const hnadleOpenCommentDialog = () => {
-        setCommentDialog(prev => !prev);
-    }
-
     const handleLike = async () => {
-        if (post.likes.indexOf(user.username) == -1) {
+        if (user !== null && post.likes.indexOf(user.username) == -1) {
             post.likes.push(user.username);
             like({ data: post.likes, id: post._id, user: user.username });
         }
@@ -71,39 +63,6 @@ export const Feeds = ({ post }) => {
         return <FavoriteBorderIcon onClick={handleLike} fontSize='large' />
     }
 
-    const CommentDialogBox = () => {
-        return (
-            <Paper className={classes.commentDialog}>
-                <div className={classes.head}>
-                    <h1>Modal title</h1>
-                    <IconButton size='large' onClick={hnadleOpenCommentDialog}>
-                        <CloseIcon />
-                    </IconButton>
-                </div>
-                <DialogContent dividers>
-                    <Typography gutterBottom>
-                        Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis
-                        in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
-                    </Typography>
-                    <Typography gutterBottom>
-                        Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis
-                        lacus vel augue laoreet rutrum faucibus dolor auctor.
-                    </Typography>
-                    <Typography gutterBottom>
-                        Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus magna, vel
-                        scelerisque nisl consectetur et. Donec sed odio dui. Donec ullamcorper nulla non metus
-                        auctor fringilla.
-                    </Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button autoFocus onClick={handleClose} color="primary">
-                        Save changes
-                    </Button>
-                </DialogActions>
-            </Paper>
-        )
-    }
-
     return (
         <Card className={classes.root} variant='outlined'>
             <CardHeader
@@ -117,12 +76,12 @@ export const Feeds = ({ post }) => {
                 }
                 action={
                     <>
-                        <IconButton disabled={isLogin} aria-label="settings" onClick={handleClickOpen}>
+                        <IconButton disabled={isLogin} aria-label="settings" onClick={() => setOpenMore(true)}>
                             <MoreHorizIcon style={{ marginRight: '22px', marginTop: '12px', }} />
                         </IconButton>
                         <Dialog
-                            open={open}
-                            onClose={handleClose}
+                            open={openMore}
+                            onClose={() => setOpenMore(false)}
                             aria-labelledby="alert-dialog-title"
                             aria-describedby="alert-dialog-description"
                         >
@@ -132,12 +91,49 @@ export const Feeds = ({ post }) => {
                                 <Button style={{ padding: '10px' }} variant='outlined'>Go To Post</Button>
                                 <Button style={{ padding: '10px' }} variant='outlined'>Share</Button>
                                 <Button style={{ padding: '10px' }} variant='outlined'>Copy link</Button>
-                                <Button style={{ padding: '10px' }} variant='outlined' onClick={handleClose}>Cancel</Button>
+                                {post.username === user?.username && (
+                                    <>
+                                        <Button style={{ padding: '10px', fontWeight: '600' }} variant='outlined' color='secondary' onClick={() => setOpenDelete(true)}>Delete Post</Button>
+                                        <Dialog
+                                            open={openDelete}
+                                            TransitionComponent={Transition}
+                                            keepMounted
+                                            onClose={() => setOpenDelete(false)}
+                                            aria-labelledby="alert-dialog-slide-title"
+                                            aria-describedby="alert-dialog-slide-description"
+                                        >
+                                            <DialogTitle id="alert-dialog-slide-title">{"Use Google's location service?"}</DialogTitle>
+                                            <DialogContent>
+                                                <DialogContentText id="alert-dialog-slide-description">
+                                                    <p>
+                                                        Once you delete your post, all user action related to this post get
+                                                        deleted and can't be recovered.
+                                                    </p>
+                                                    <p>
+                                                        Are you sure you want to delete your post
+                                                    </p>
+                                                </DialogContentText>
+                                            </DialogContent>
+                                            <DialogActions>
+                                                <Button onClick={() => setOpenDelete(false)} color="primary">
+                                                    Cancel
+                                                </Button>
+                                                <Button onClick={() => {
+                                                    deletePost({ _id: post._id })
+                                                    setOpenMore(false);
+                                                }} color="primary">
+                                                    Delete
+                                                </Button>
+                                            </DialogActions>
+                                        </Dialog>
+                                    </>
+                                )}
+                                <Button style={{ padding: '10px' }} variant='outlined' onClick={() => setOpenMore(false)}>Cancel</Button>
                             </Paper>
                         </Dialog>
                     </>
                 }
-                title={<Typography onMouseEnter={handleClickOpen} onMouseLeave={handleClose} className={classes.user_dialog} variant='h6'>{post.username}</Typography>}
+                title={<Typography className={classes.user_dialog} variant='h6'>{post.username}</Typography>}
                 subheader={moment(post.createdAt).fromNow()}
             />
             <div className={classes.line} />
@@ -145,7 +141,7 @@ export const Feeds = ({ post }) => {
                 onDoubleClick={handleLike}
                 className={classes.media}
                 image={post.file}
-                title="image"
+                title={post.tags[0]}
             />
             <CardActions>
                 <IconButton disabled={isLogin} size='small'>
@@ -168,22 +164,16 @@ export const Feeds = ({ post }) => {
                 <div>
                     <Typography
                         className={classes.user_dialog}
-                        color='textPrimary'
+                        color='textSecondary'
                         variant='inherit'
-                        onClick={hnadleOpenCommentDialog}
+                        onClick={() => setOpenComment(true)}
                     >
                         {post.comments.length > 0 ? (`view all ${post.comments.length} comments`) : ('Be the first to comment')}
                     </Typography>
-                    <Dialog
-                        open={commentDialog}
-                        onClose={hnadleOpenCommentDialog}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description"
-                    >
-                        <CommentDialogBox />
+                    <Dialog maxWidth='md' fullWidth open={openComment} onClose={() => setOpenComment(false)} TransitionComponent={Transition}>
+                        <CommentDialogBox setOpenComment={setOpenComment} post={post} />
                     </Dialog>
                 </div>
-                { }
                 {post.comments.length > 0 && (
                     <div>
                         <Typography className={classes.user_dialog} color='textPrimary' variant='h6'>
@@ -202,7 +192,11 @@ export const Feeds = ({ post }) => {
                 )}
             </CardContent>
             <div className={classes.search}>
+                <Avatar aria-label="recipe" className={classes.small} src={user?.profilePicture}>
+                    {post.name.charAt(0)}
+                </Avatar>
                 <InputBase
+                    style={{ marginLeft: '5px' }}
                     disabled={isLogin}
                     placeholder="Add your comment..."
                     fullWidth

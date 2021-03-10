@@ -14,7 +14,7 @@ export const ChatContext = createContext(initialState);
 export const ChatProvider = ({ children }) => {
 
     const [state, dispatch] = useReducer(ChatReducer, initialState);
-    const { user } = useContext(GlobalContext)
+    const { user, socket } = useContext(GlobalContext)
 
     useEffect(async () => {
         const chatlist = user?.friends;
@@ -29,11 +29,6 @@ export const ChatProvider = ({ children }) => {
             }
         });
     }
-
-    const sendMsg = (msg) => {
-        dispatch({ type: 'SEND', payload: msg })
-    }
-
 
     return (
         <ChatContext.Provider value={{

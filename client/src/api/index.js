@@ -25,6 +25,7 @@ export const getPosts = () => API.get('/post');
 export const createPost = (data) => API.post(`/post/createPost`, data);
 export const like = (data) => API.patch('/post/like', data);
 export const comment = (data) => API.post('/post/comment', data);
+export const deletePost = (_id) => API.delete(`/post/${_id}`)
 
 
 export const getChatList = (data) => API.post('/inbox/chatlist', data);

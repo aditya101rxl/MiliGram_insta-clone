@@ -4,8 +4,6 @@ export default (state, action) => {
             return { ...state, chatList: action.payload }
         case 'SELECT':
             return { ...state, activeChat: action.payload }
-        case 'SEND':
-            return { ...state, activeChat: { ...state.activeChat, message: action.payload } }
         default:
             return state;
     }

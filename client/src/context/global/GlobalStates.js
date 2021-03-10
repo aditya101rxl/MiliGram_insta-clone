@@ -1,12 +1,13 @@
 import React, { createContext, useReducer, useEffect, useState } from 'react'
 import GlobalReducer from './GlobalReducer'
 import * as api from '../../api'
-import socketio from 'socket.io-client';
+import io from 'socket.io-client'
 
 
 const initialState = {
     posts: [],
-    user: null
+    user: null,
+    socket: null,
 }
 
 export const GlobalContext = createContext(initialState)
@@ -19,8 +20,8 @@ export const GlobalProvider = ({ children }) => {
     const signin = async (formData, history) => {
         try {
             const { data } = await api.signin(formData)
-            console.log(data);
-            dispatch({ type: 'SIGNIN', payload: data })
+            const socketio = io.connect('http://localhost:5000', { query: { user: data.user.username } });
+            dispatch({ type: 'SIGNIN', payload: { data, socketio } })
             history.push('/')
         } catch (error) {
             console.log(error);
@@ -30,12 +31,14 @@ export const GlobalProvider = ({ children }) => {
     const signup = async (formData, history) => {
         try {
             const { data } = await api.signup(formData);
-            dispatch({ type: 'SIGNUP', payload: data })
+            const socketio = io.connect('http://localhost:5000', { query: { user: data.user.username } });
+            dispatch({ type: 'SIGNUP', payload: { data, socketio } })
             history.push('/')
         } catch (error) {
             console.log(error);
         }
     }
+
     const logout = () => {
         dispatch({ type: 'LOGOUT', payload: null })
     }
@@ -75,21 +78,25 @@ export const GlobalProvider = ({ children }) => {
         dispatch({ type: 'COMMENT', payload: { id, data } });
     }
 
+    const deletePost = ({ _id }) => {
+        api.deletePost(_id).then(({ data }) => {
+            console.log(data);
+        })
+        dispatch({ type: 'DELETEPOST', payload: _id });
+    }
+
     const editUser = (data) => {
         dispatch({ type: 'USER', payload: data });
     }
 
-    // socket connection if user exist
-    useEffect(() => {
-        console.log('user changed..');
-    }, [state.user])
-
     useEffect(() => {
         getPosts();
+        // return () => socketio.close();
         const username = JSON.parse(localStorage.getItem('profile'))?.username
         if (username != undefined) {
             api.findUser(username).then(user => {
-                dispatch({ type: 'USER', payload: user.data });
+                const socketio = io.connect('http://localhost:5000', { query: { user: username } });
+                dispatch({ type: 'USER', payload: { user: user.data, socketio } });
             })
         }
     }, [])
@@ -98,6 +105,7 @@ export const GlobalProvider = ({ children }) => {
         <GlobalContext.Provider value={{
             posts: state.posts,
             user: state.user,
+            socket: state.socket,
             signin,
             signup,
             logout,
@@ -106,6 +114,7 @@ export const GlobalProvider = ({ children }) => {
             like,
             dislike,
             commentPost,
+            deletePost,
             editUser,
         }}>
             {children}

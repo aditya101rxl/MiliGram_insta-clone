@@ -11,7 +11,6 @@ export const getPosts = async (req, res) => {
     }
 }
 
-
 export const createPost = async (req, res) => {
 
     if (!req.userId) return res.send("Unauthorized User")
@@ -37,4 +36,10 @@ export const like = async (req) => {
 export const comment = async (req) => {
     const { _id, comment } = req.body;
     await Post.findByIdAndUpdate(_id, { $push: { comments: comment } });
+}
+
+export const deletePost = async (req, res) => {
+    const { _id } = req.params;
+    await Post.findByIdAndRemove(_id);
+    res.send({ message: "Post deleted successfully.." })
 }

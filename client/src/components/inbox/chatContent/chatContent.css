@@ -1,5 +1,6 @@
 .main__chatcontent {
     flex-grow: 1;
+    height: 87vh;
     padding: 7px 11px;
     max-width: 67%;
     border-right: 1px solid #ebe7fb;

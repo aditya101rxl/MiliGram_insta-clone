@@ -20,9 +20,6 @@ export const useStyles = makeStyles((theme) => ({
     expandOpen: {
         transform: 'rotate(180deg)',
     },
-    avatar: {
-        backgroundColor: red[500],
-    },
     dialog_paper: {
         width: '320px',
         display: 'flex',
@@ -37,10 +34,15 @@ export const useStyles = makeStyles((theme) => ({
         }
     },
     search: {
+        display: 'flex',
         width: '100%',
         marginTop: '-13px',
-        marginLeft: '27px'
+        marginLeft: '12px'
     },
+    small: {
+        width: theme.spacing(3),
+        height: theme.spacing(3),
+      },
     inputRoot: {
         color: 'inherit',
     },
@@ -63,7 +65,7 @@ export const useStyles = makeStyles((theme) => ({
         }
     },
     commentDialog: {
-        width: '100%',
+        width: '80vw',
     },
     head: {
         display: 'flex',

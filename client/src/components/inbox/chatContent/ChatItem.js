@@ -12,7 +12,7 @@ export const ChatItem = ({ user, msg, image }) => {
                 <div className="chat__msg">{msg.m}</div>
                 <div className="chat__meta">
                     <span>{msg.time}</span>
-                    <span>Seen 1.03PM</span>
+                    <span>Seen</span>
                 </div>
             </div>
             <Avatar isOnline="active" image={image} />
