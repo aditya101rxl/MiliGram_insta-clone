@@ -7,7 +7,6 @@ export const useStyles = makeStyles((theme) => ({
         marginBottom: '40px'
     },
     media: {
-        height: 20,
         paddingTop: '100.25%', // 16:9
     },
     expand: {

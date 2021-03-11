@@ -1,5 +1,5 @@
 import express from 'express';
-import { signin, signup, findUser, updateProfile } from '../controller/user.js';
+import { getOtp, signin, signup, findUser, updateProfile } from '../controller/user.js';
 import { confirmFollowRequest, sendFollowRequest, cancelFollowRequest } from '../controller/user.js';
 import { auth } from '../middleware/auth.js';
 
@@ -7,6 +7,7 @@ import { auth } from '../middleware/auth.js';
 const router = express.Router();
 
 
+router.post('/getOtp', getOtp)
 router.post('/signin', signin)
 router.post('/signup', signup)
 

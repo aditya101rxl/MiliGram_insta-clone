@@ -7,9 +7,6 @@ export const useStyles = makeStyles((theme) => ({
     avatar: {
         marginRight: theme.spacing(2),
     },
-    // menuButton: {
-    //     marginRight: theme.spacing(2),
-    // },
     title: {
         display: 'block',
         [theme.breakpoints.up('sm')]: {
@@ -66,7 +63,10 @@ export const useStyles = makeStyles((theme) => ({
         },
     },
     logo: {
-        width: '250px',
+        width: '200px',
         height: '30px',
+        [theme.breakpoints.down('sm')]: {
+            width: '100px',
+        },
     }
 }));

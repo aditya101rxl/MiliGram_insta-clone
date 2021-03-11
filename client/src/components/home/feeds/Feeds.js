@@ -102,7 +102,7 @@ export const Feeds = ({ post }) => {
                                             aria-labelledby="alert-dialog-slide-title"
                                             aria-describedby="alert-dialog-slide-description"
                                         >
-                                            <DialogTitle id="alert-dialog-slide-title">{"Use Google's location service?"}</DialogTitle>
+                                            <DialogTitle id="alert-dialog-slide-title">{"Delete this post"}</DialogTitle>
                                             <DialogContent>
                                                 <DialogContentText id="alert-dialog-slide-description">
                                                     <p>
@@ -137,12 +137,9 @@ export const Feeds = ({ post }) => {
                 subheader={moment(post.createdAt).fromNow()}
             />
             <div className={classes.line} />
-            <CardMedia
-                onDoubleClick={handleLike}
-                className={classes.media}
-                image={post.file}
-                title={post.tags[0]}
-            />
+            <div style={{ backgroundColor: 'red' }} onDoubleClick={handleLike}>
+                <img style={{ display: 'block', margin: '0 auto', width: '100%' }} src={post.file} />
+            </div>
             <CardActions>
                 <IconButton disabled={isLogin} size='small'>
                     <Like />

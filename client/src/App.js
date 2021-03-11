@@ -12,7 +12,7 @@ import { ChatBody } from './components/inbox/chatBody/ChatBody'
 const App = () => {
 
   return (
-    <div style={{ maxWidth: "65rem", margin: "0 auto" }}>
+    <div style={{ maxWidth: "63rem", margin: "0 auto" }}>
       <GlobalProvider>
         <Router>
           <Navbar />

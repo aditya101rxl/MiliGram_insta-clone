@@ -15,8 +15,6 @@ import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { useStyles } from './style'
-import shirley from '../default.jpg'
-import { Navbar } from '../navbar/Navbar';
 
 export const PostView = () => {
     const classes = useStyles();
@@ -44,7 +42,7 @@ export const PostView = () => {
             />
             <CardMedia
                 className={classes.media}
-                image={shirley}
+                image=''
                 title="Paella dish"
             />
             <CardContent>

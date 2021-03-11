@@ -10,6 +10,7 @@ API.interceptors.request.use((req) => {
     return req;
 });
 
+export const getOtp = (data) => API.post('/user/getOtp', data);
 export const signin = (signinData) => API.post('/user/signin', signinData);
 export const signup = (signupData) => API.post('/user/signup', signupData);
 export const findUser = (username) => API.get(`/user/profile/${username}`);

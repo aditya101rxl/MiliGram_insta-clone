@@ -134,10 +134,10 @@ export const Navbar = (props) => {
     );
 
     return (
-        <React.Fragment>
+        <React.Fragment >
             <CssBaseline />
             <ElevationScroll {...props}>
-                <div className={classes.grow}>
+                <div className={classes.grow} >
                     <AppBar color='default'>
                         <Toolbar>
                             <Link to='/'>
@@ -210,11 +210,6 @@ export const Navbar = (props) => {
                 </div>
             </ElevationScroll>
             <Toolbar />
-            <Container>
-                <Box my={1}>
-
-                </Box>
-            </Container>
         </React.Fragment >
     );
 }

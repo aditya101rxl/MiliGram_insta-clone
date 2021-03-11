@@ -29,8 +29,6 @@ export const Profile = () => {
 
     useEffect(async () => {
         const { data } = await api.findUser(username);
-        console.log(data);
-        console.log(user);
         setUserFound(data);
     }, [location])
 
@@ -42,7 +40,7 @@ export const Profile = () => {
                 userposts.push(element);
             }
         }
-        setUserPosts(userposts);
+        setUserPosts([...userposts]);
     }, [userFound])
 
     const handleCreatePost = () => history.push('/post/createPost');
@@ -110,7 +108,7 @@ export const Profile = () => {
                                     {(userFound?._id) != (user?._id) && <Follow
                                         username={userFound?.username} profilePicture={userFound?.profilePicture}
                                     />}
-                                    {(userFound._id) === (user?._id) && (
+                                    {(userFound?._id) === (user?._id) && (
                                         <Button
                                             fullWidth
                                             variant="outlined"

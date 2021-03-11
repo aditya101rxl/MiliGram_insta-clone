@@ -30,7 +30,7 @@ export const Home = () => {
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} sm={8}>
-                <Box component="div" height="86vh" overflow="auto" className={classes.scrollbar}>
+                <Box component="div" style={{marginTop:'5px'}} className={classes.scrollbar}>
                     {posts.length ? (
                         posts.map(post => <Feeds post={post} />)
                     ) : (
@@ -39,7 +39,9 @@ export const Home = () => {
                 </Box>
             </Grid>
             <Grid item xs={12} sm={4} className={classes.sectionMobile}>
-                <Profile />
+                <div style={{ height: '100%' }}>
+                    <Profile />
+                </div>
             </Grid>
         </Grid >
     )
