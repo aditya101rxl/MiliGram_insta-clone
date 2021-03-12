@@ -2,17 +2,10 @@ import axios from 'axios'
 
 const API = axios.create({ baseURL: 'http://localhost:5000' });
 
-// authorization of user in middleware
-API.interceptors.request.use((req) => {
-    if (localStorage.getItem('profile')) {
-        req.headers.Authorization = `Bearer ${JSON.parse(localStorage.getItem('profile')).token}`;
-    }
-    return req;
-});
-
 export const getOtp = (data) => API.post('/user/getOtp', data);
 export const signin = (signinData) => API.post('/user/signin', signinData);
 export const signup = (signupData) => API.post('/user/signup', signupData);
+export const logout = () => API.get('/user/logout');
 export const findUser = (username) => API.get(`/user/profile/${username}`);
 export const updateProfile = (id, data) => API.patch(`/user/profile/update/${id}`, data);
 

@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
 import http from 'http'
 import * as io from 'socket.io'
@@ -13,8 +14,9 @@ import { socketController } from './controller/socket.js'
 
 const app = express();
 
-app.use(bodyParser.json({ limit: "30mb", extended: true }));
-app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(cors());
 
 const PORT = process.env.PORT || 5000;

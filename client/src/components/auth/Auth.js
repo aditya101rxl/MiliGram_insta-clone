@@ -26,7 +26,6 @@ export const Auth = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        console.log(loginFormData);
         if (isSignup) {
             if (loginFormData.password !== loginFormData.confirmPassword) {
                 alert(`password don't match`);

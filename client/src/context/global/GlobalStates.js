@@ -20,7 +20,8 @@ export const GlobalProvider = ({ children }) => {
     const signin = async (formData, history) => {
         try {
             const { data } = await api.signin(formData)
-            const socketio = io.connect('http://localhost:5000', { query: { user: data.user.username } });
+            console.log(data);
+            const socketio = io.connect('http://localhost:5000', { query: { user: data.username } });
             dispatch({ type: 'SIGNIN', payload: { data, socketio } })
             history.push('/')
         } catch (error) {
@@ -31,7 +32,7 @@ export const GlobalProvider = ({ children }) => {
     const signup = async (formData, history) => {
         try {
             const { data } = await api.signup(formData);
-            const socketio = io.connect('http://localhost:5000', { query: { user: data.user.username } });
+            const socketio = io.connect('http://localhost:5000', { query: { user: data.username } });
             dispatch({ type: 'SIGNUP', payload: { data, socketio } })
             history.push('/')
         } catch (error) {
@@ -40,6 +41,7 @@ export const GlobalProvider = ({ children }) => {
     }
 
     const logout = () => {
+        api.logout();
         dispatch({ type: 'LOGOUT', payload: null })
     }
 
