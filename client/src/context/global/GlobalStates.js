@@ -21,7 +21,6 @@ export const GlobalProvider = ({ children }) => {
     const signin = async (formData, history) => {
         try {
             const { data } = await api.signin(formData)
-            console.log(data);
             const socketio = io.connect('http://localhost:5000', { query: { user: data.user?.username } });
             const token = { token: data.token, username: data.user.username };
             cookies.set('jwt', token, { maxAge: 3 * 60 * 60 * 1000, path: '/' });
