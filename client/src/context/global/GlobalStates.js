@@ -1,7 +1,8 @@
-import React, { createContext, useReducer, useEffect, useState } from 'react'
+import React, { createContext, useReducer, useEffect } from 'react'
 import GlobalReducer from './GlobalReducer'
 import * as api from '../../api'
 import io from 'socket.io-client'
+import Cookies from 'universal-cookie';
 
 
 const initialState = {
@@ -11,17 +12,19 @@ const initialState = {
 }
 
 export const GlobalContext = createContext(initialState)
+const cookies = new Cookies();
 
 export const GlobalProvider = ({ children }) => {
 
     const [state, dispatch] = useReducer(GlobalReducer, initialState);
-
-    // Authorization actions
+    // Actions
     const signin = async (formData, history) => {
         try {
             const { data } = await api.signin(formData)
             console.log(data);
-            const socketio = io.connect('http://localhost:5000', { query: { user: data.username } });
+            const socketio = io.connect('http://localhost:5000', { query: { user: data.user?.username } });
+            const token = { token: data.token, username: data.user.username };
+            cookies.set('jwt', token, { maxAge: 3 * 60 * 60 * 1000, path: '/' });
             dispatch({ type: 'SIGNIN', payload: { data, socketio } })
             history.push('/')
         } catch (error) {
@@ -32,7 +35,9 @@ export const GlobalProvider = ({ children }) => {
     const signup = async (formData, history) => {
         try {
             const { data } = await api.signup(formData);
-            const socketio = io.connect('http://localhost:5000', { query: { user: data.username } });
+            const socketio = io.connect('http://localhost:5000', { query: { user: data.user.username } });
+            const token = { token: data.token, username: data.user.username };
+            cookies.set('jwt', token, { maxAge: 3 * 60 * 60 * 1000, path: '/' });
             dispatch({ type: 'SIGNUP', payload: { data, socketio } })
             history.push('/')
         } catch (error) {
@@ -41,8 +46,9 @@ export const GlobalProvider = ({ children }) => {
     }
 
     const logout = () => {
-        api.logout();
+        cookies.remove('jwt');
         dispatch({ type: 'LOGOUT', payload: null })
+        window.location.reload();
     }
 
     const createPost = async (formData, history) => {
@@ -94,7 +100,7 @@ export const GlobalProvider = ({ children }) => {
     useEffect(() => {
         getPosts();
         // return () => socketio.close();
-        const username = JSON.parse(localStorage.getItem('profile'))?.username
+        const username = cookies.get('jwt')?.username
         if (username != undefined) {
             api.findUser(username).then(user => {
                 const socketio = io.connect('http://localhost:5000', { query: { user: username } });

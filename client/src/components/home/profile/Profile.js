@@ -8,12 +8,7 @@ import { GlobalContext } from '../../../context/global/GlobalStates';
 export const Profile = () => {
     const classes = useStyles()
     const history = useHistory()
-    const { user } = useContext(GlobalContext)
-
-    const logout = () => {
-        localStorage.clear();
-        window.location.reload()
-    }
+    const { user, logout } = useContext(GlobalContext)
 
     const handleProfileView = () => history.push(`/user/profile/${user.username}`);
     const handleCreatePost = () => history.push('/post/createPost');
@@ -43,7 +38,7 @@ export const Profile = () => {
                                 <Button fullWidth variant='outlined' color='primary' onClick={handleProfileView}>Profile</Button>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <Button fullWidth variant='outlined' color='secondary' onClick={logout}>Logout</Button>
+                                <Button fullWidth variant='outlined' color='secondary' onClick={() => logout()}>Logout</Button>
                             </Grid>
                         </Grid>
                     </>

@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-import bodyParser from 'body-parser'
+// import bodyParser from 'body-parser'
 import http from 'http'
 import * as io from 'socket.io'
 
@@ -29,7 +29,7 @@ const server = http.createServer(app);
 const socketio = new io.Server(server, {
     cors: {
         origin: "http://localhost:3000",
-        methods: ["GET", "POST"]
+        methods: ["*"]
     }
 })
 

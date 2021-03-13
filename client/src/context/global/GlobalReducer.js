@@ -8,7 +8,7 @@ export default (state, action) => {
         case 'SIGNUP':
             return {
                 ...state,
-                user: { ...action.payload.data, password: null },
+                user: { ...action.payload.data.user, password: null },
                 socket: action.payload.socketio
             }
         case 'LOGOUT':

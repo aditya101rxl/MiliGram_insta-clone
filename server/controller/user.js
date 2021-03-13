@@ -4,6 +4,12 @@ import jwt from 'jsonwebtoken'
 import nodemailer from 'nodemailer'
 import { SECRET_KEY, emailId, password } from '../private.js'
 
+// export const setCookie = (req, res) => {
+//     res.cookie('new', 'okay');
+//     console.log('cookies saved');
+//     res.send('hello dear')
+// }
+
 export const getOtp = (req, res) => {
     const targetEmail = req.body.email;
     const transporter = nodemailer.createTransport({
@@ -42,11 +48,7 @@ export const signin = async (req, res) => {
         if (!existingUser) return res.send({ message: "User doesn't exist" })
         if (existingUser.password !== password) return res.send({ message: "Invalid credentials." })
         const token = jwt.sign({ username: existingUser.username, id: existingUser._id }, SECRET_KEY, { expiresIn: '3h' })
-        let options = {
-            maxAge: 1000 * 60 * 120,
-        }
-        res.cookie('my_cookie', 'geeksforgeeks');
-        return res.send(existingUser);
+        return res.send({ user: existingUser, token });
     } catch (error) {
         return res.send({ message: "something went wrong." })
     }
@@ -60,20 +62,10 @@ export const signup = async (req, res) => {
         if (password !== confirmPassword) return res.send({ message: "password don't match" });
         const newUser = await User.create({ username, name: `${firstname} ${lastname}`, email, password });
         const token = jwt.sign({ username: newUser.username, id: newUser._id }, SECRET_KEY, { expiresIn: '3h' })
-        let options = {
-            maxAge: 1000 * 60 * 120,
-            httpOnly: true,
-        }
-        res.cookie('user_id', token, options)
-        return res.send(newUser);
+        return res.send({ user: newUser, token });
     } catch (error) {
         return res.send({ message: "something went wrong." });
     }
-}
-
-export const logout = (req, res) => {
-    res.cookie('profile', '', { maxAge: 10, httpOnly: true })
-    res.send({ message: 'logout success' });
 }
 
 export const findUser = async (req, res) => {

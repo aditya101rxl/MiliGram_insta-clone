@@ -38,7 +38,7 @@ export const Navbar = (props) => {
     const location = useLocation();
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
-    const { user } = useContext(GlobalContext);
+    const { user, logout } = useContext(GlobalContext);
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -59,11 +59,6 @@ export const Navbar = (props) => {
     const handleMobileMenuOpen = (event) => {
         setMobileMoreAnchorEl(event.currentTarget);
     };
-
-    const logout = () => {
-        localStorage.clear();
-        window.location.reload()
-    }
 
     const handleProfileView = () => history.push(`/user/profile/${user?.username}`)
 
@@ -185,7 +180,7 @@ export const Navbar = (props) => {
                                                 <Avatar alt={user?.name} src={user?.profilePicture} />
                                             </IconButton>
                                         </div>
-                                        <Button variant='outlined' color="secondary" onClick={logout}>logout</Button>
+                                        <Button variant='outlined' color="secondary" onClick={()=> logout()}>logout</Button>
                                         <div className={classes.sectionMobile}>
                                             <IconButton
                                                 aria-label="show more"

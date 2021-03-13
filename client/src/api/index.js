@@ -1,6 +1,17 @@
 import axios from 'axios'
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
 
 const API = axios.create({ baseURL: 'http://localhost:5000' });
+
+// authorization of user in middleware
+API.interceptors.request.use((req) => {
+    if (cookies.get('jwt') !== undefined) {
+        req.headers.Authorization = `token ${cookies.get('jwt').token}`;
+    }
+    return req;
+});
+
 
 export const getOtp = (data) => API.post('/user/getOtp', data);
 export const signin = (signinData) => API.post('/user/signin', signinData);
