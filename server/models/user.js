@@ -13,6 +13,7 @@ const userSchema = mongoose.Schema({
     pendingRequest: { type: [], default: [] },
     friends: { type: [mongoose.Types.ObjectId], ref: 'Chat' },
     notification: { type: [Object], default: [] },
+    notificationCount: { type: Number, default: 0 }
 }, { timestamps: true })
 
 export default mongoose.model('User', userSchema);

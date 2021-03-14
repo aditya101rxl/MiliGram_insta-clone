@@ -2,22 +2,29 @@ import React, { useContext, useState } from 'react';
 import FileBase from 'react-file-base64'
 import Grid from '@material-ui/core/Grid';
 import * as api from '../../../api'
-import { Button, TextField } from '@material-ui/core';
+import { Button, LinearProgress, TextField } from '@material-ui/core';
 import { useStyles } from './style';
 import { GlobalContext } from '../../../context/global/GlobalStates';
 
-export const EditProfile = ({ user, setEdit }) => {
+export const EditProfile = ({ user, setEdit, history }) => {
     const classes = useStyles();
     const { editUser } = useContext(GlobalContext)
     const [changes, setChanges] = useState({ name: user.name, email: user.email, status: user.status, profilePicture: user.profilePicture })
 
+    const [loading, setLoading] = useState(false);
     const handleChanges = async (e) => {
         e.preventDefault()
+        setLoading(true);
         const { data } = await api.updateProfile(user._id, changes)
+        console.log(data);
         editUser(data);
-        setEdit(prev => !prev)
+        window.location.reload();
     }
-
+    if (loading) {
+        return (
+            <LinearProgress />
+        )
+    }
     return (
         <div className={classes.root}>
             <Grid container spacing={1}>
@@ -69,7 +76,6 @@ export const EditProfile = ({ user, setEdit }) => {
                             />
                         </Grid>
                         <Button
-                            disabled={(user.username) !== (JSON.parse(localStorage.getItem('profile'))?.username)}
                             variant='contained'
                             color='primary'
                             fullWidth
@@ -79,7 +85,6 @@ export const EditProfile = ({ user, setEdit }) => {
                             &nbsp;Save Changes
                         </Button>
                         <Button
-                            disabled={(user.username) !== (JSON.parse(localStorage.getItem('profile'))?.username)}
                             variant='contained'
                             color='secondary'
                             fullWidth

@@ -36,6 +36,11 @@ export default (state, action) => {
             }
         case 'DELETEPOST':
             return { ...state, posts: state.posts.filter(post => post._id !== action.payload) }
+        case 'CLEAR':
+            return {
+                ...state,
+                user: { ...state.user, notificationCount: action.payload }
+            }
         default:
             return state;
     }

@@ -1,4 +1,5 @@
 import Post from '../models/post.js';
+import User from '../models/user.js';
 
 
 export const getPosts = async (req, res) => {
@@ -27,19 +28,37 @@ export const createPost = async (req, res) => {
 export const like = async (req) => {
     const { _id, username, islike } = req.body;
     if (islike) {
-        await Post.findByIdAndUpdate(_id, { $push: { likes: username } });
+        const newPost = await Post.findByIdAndUpdate(_id, { $push: { likes: username } });
+        const newNotice = { username: username, message: 'like your post', id: _id };
+        await User.findOneAndUpdate({ username: newPost.username },
+            {
+                $push: { notification: newNotice },
+                $inc: { notificationCount: 1 }
+            });
     } else {
         await Post.findByIdAndUpdate(_id, { $pull: { likes: username } });
     }
 }
 
 export const comment = async (req) => {
-    const { _id, comment } = req.body;
-    await Post.findByIdAndUpdate(_id, { $push: { comments: comment } });
+    const { _id, comment, user } = req.body;
+    const newPost = await Post.findByIdAndUpdate(_id, { $push: { comments: comment } });
+    const newNotice = { username: user, message: 'commented on your post', id: _id };
+    await User.findOneAndUpdate({ username: newPost.username },
+        {
+            $push: { notification: newNotice },
+            $inc: { notificationCount: 1 }
+        });
 }
 
 export const deletePost = async (req, res) => {
     const { _id } = req.params;
     await Post.findByIdAndRemove(_id);
     res.send({ message: "Post deleted successfully.." })
+}
+
+export const findPost = async (req, res) => {
+    const { _id } = req.params
+    const post = await Post.findById(_id);
+    res.send(post);
 }

@@ -23,7 +23,7 @@ export const GlobalProvider = ({ children }) => {
             const { data } = await api.signin(formData)
             const socketio = io.connect('http://localhost:5000', { query: { user: data.user?.username } });
             const token = { token: data.token, username: data.user.username };
-            cookies.set('jwt', token, { maxAge: 3 * 60 * 60 * 1000, path: '/' });
+            cookies.set('jwt', token, { maxAge: 7 * 60 * 60 });
             dispatch({ type: 'SIGNIN', payload: { data, socketio } })
             history.push('/')
         } catch (error) {
@@ -36,7 +36,7 @@ export const GlobalProvider = ({ children }) => {
             const { data } = await api.signup(formData);
             const socketio = io.connect('http://localhost:5000', { query: { user: data.user.username } });
             const token = { token: data.token, username: data.user.username };
-            cookies.set('jwt', token, { maxAge: 3 * 60 * 60 * 1000, path: '/' });
+            cookies.set('jwt', token, { maxAge: 7 * 60 * 60 });
             dispatch({ type: 'SIGNUP', payload: { data, socketio } })
             history.push('/')
         } catch (error) {
@@ -81,7 +81,7 @@ export const GlobalProvider = ({ children }) => {
     }
 
     const commentPost = ({ data, comment, id }) => {
-        api.comment({ _id: id, comment });
+        api.comment({ _id: id, comment, user: state.user?.username });
         dispatch({ type: 'COMMENT', payload: { id, data } });
     }
 
@@ -93,7 +93,13 @@ export const GlobalProvider = ({ children }) => {
     }
 
     const editUser = (data) => {
-        dispatch({ type: 'USER', payload: data });
+        const updatedUser = { user: data };
+        dispatch({ type: 'USER', payload: updatedUser });
+    }
+
+    const clearNotice = () => {
+        api.clearNotice(state?.user?.username);
+        dispatch({ type: 'CLEAR', payload: 0 })
     }
 
     useEffect(() => {
@@ -123,6 +129,7 @@ export const GlobalProvider = ({ children }) => {
             commentPost,
             deletePost,
             editUser,
+            clearNotice,
         }}>
             {children}
         </GlobalContext.Provider>

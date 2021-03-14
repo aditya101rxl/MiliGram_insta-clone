@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
-import { InputBase, AppBar, Toolbar, Typography, CssBaseline, useScrollTrigger, Box, Container, IconButton, Badge, Menu, MenuItem, Button, Avatar } from '@material-ui/core'
+import { InputBase, AppBar, Toolbar, Typography, CssBaseline, ListItemSecondaryAction } from '@material-ui/core'
+import { useScrollTrigger, Popover, IconButton, Badge, Menu, MenuItem, Button, Avatar } from '@material-ui/core'
+import { ListItem, List, ListItemText, ListItemAvatar, Divider, CircularProgress } from '@material-ui/core'
+import ClearAllIcon from '@material-ui/icons/ClearAll';
 import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MessageIcon from '@material-ui/icons/Message';
@@ -9,9 +12,11 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import HomeIcon from '@material-ui/icons/Home';
 import { useStyles } from './style';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import { Link, useHistory, useLocation } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
+import InfoIcon from '@material-ui/icons/Info';
 import logo from '../logo.png'
 import { GlobalContext } from '../../context/global/GlobalStates';
+import * as api from '../../api'
 
 function ElevationScroll(props) {
 
@@ -35,49 +40,134 @@ ElevationScroll.propTypes = {
 export const Navbar = (props) => {
     const classes = useStyles();
     const history = useHistory();
-    const location = useLocation();
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    // const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
-    const { user, logout } = useContext(GlobalContext);
+    const { user, logout, clearNotice } = useContext(GlobalContext);
 
-    const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-    const handleProfileMenuOpen = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+    const [openPop1, setOpenPop1] = useState(null);
+    const open1 = Boolean(openPop1);
+    const id1 = open1 ? 'simple-popover' : undefined;
+    const [openPop2, setOpenPop2] = useState(null);
+    const open2 = Boolean(openPop2);
+    const id2 = open1 ? 'simple-popover' : undefined;
 
-    const handleMobileMenuClose = () => {
-        setMobileMoreAnchorEl(null);
-    };
+    const [query, setQuery] = useState('');
+    const [result, setResult] = useState(null);
+    const handleQuerySearch = async (e) => {
+        if (query.length !== 0) {
+            setOpenPop1(e.currentTarget);
+            const { data } = await api.searchQuery(query);
+            setResult(data);
+        }
+    }
 
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-        handleMobileMenuClose();
-    };
-
-    const handleMobileMenuOpen = (event) => {
-        setMobileMoreAnchorEl(event.currentTarget);
-    };
-
+    const handleMobileMenuClose = () => setMobileMoreAnchorEl(null)
+    const handleMobileMenuOpen = (event) => setMobileMoreAnchorEl(event.currentTarget)
     const handleProfileView = () => history.push(`/user/profile/${user?.username}`)
 
+    const Popover1 = () => {
+        return (
+            <Popover
+                id={id1}
+                open={open1}
+                anchorEl={openPop1}
+                onClose={() => { setQuery(''); setOpenPop1(null); setResult(null) }}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                }}
+            >
+                <List style={{ width: '250px' }}>
+                    {result === null && (
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <CircularProgress />
+                        </div>
+                    )}
+                    {result?.length === 0 ? (
+                        <Typography variant='h6'>No result found</Typography>
+                    ) : (
+                        result?.map(u => (
+                            <>
+                                <ListItem style={{ cursor: 'pointer' }} alignItems="flex-start"
+                                    onClick={() => {
+                                        setOpenPop1(null);
+                                        history.push(`/user/profile/${u?.username}`)
+                                    }}>
+                                    <ListItemAvatar>
+                                        <Avatar alt={u.name} src={u.profilePicture} />
+                                    </ListItemAvatar>
+                                    <ListItemText
+                                        primary={u.username}
+                                        secondary={u.name}
+                                    />
+                                </ListItem>
+                                <Divider variant="inset" component="li" />
+                            </>
+                        ))
+                    )}
+                </List>
+            </Popover>
+        )
+    }
 
-    const menuId = 'primary-search-account-menu';
-    const renderMenu = (
-        <Menu
-            anchorEl={anchorEl}
-            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            id={menuId}
-            keepMounted
-            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-            open={isMenuOpen}
-            onClose={handleMenuClose}
-        >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-        </Menu>
-    );
+    const Popover2 = () => {
+        return (
+            <Popover
+                id={id2}
+                open={open2}
+                anchorEl={openPop2}
+                onClose={() => { setOpenPop2(null) }}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                }}
+            >
+                <List style={{ width: '250px' }}>
+                    <Button style={{ display: 'block', marginLeft: 'auto' }} size='small' variant='text' onClick={() => clearNotice()}>
+                        mark all as read &nbsp;
+                        <ClearAllIcon />
+                    </Button>
+                    <div style={{ backgroundColor: 'grey', height: '1px' }}></div>
+                    {user?.notification?.length === 0 ? (
+                        <Typography>No notification</Typography>
+                    ) : (
+                        user?.notification?.slice(0).reverse().map((notic, index) => {
+                            return (
+                                <ListItem style={{ backgroundColor: `${index < user?.notificationCount ? '#ecd2d2' : ''}` }} key={index} role={undefined} dense >
+                                    <ListItemText
+                                        style={{ marginTop: '0', marginBottom: '-1px' }}
+                                        primary={
+                                            <Typography onClick={() => history.push(`/user/profile/${notic.username}`)} className={classes.user_dialog} color='textPrimary' variant='h6'>{notic.username}</Typography>
+                                        }
+                                        secondary={<div style={{ marginTop: '-7px' }}>{notic.message}</div>}
+                                    />
+                                    <ListItemSecondaryAction>
+                                        <IconButton edge="end" aria-label="comments">
+                                            {(notic.message.indexOf('requested') !== -1) ? (
+                                                <InfoIcon style={{ fontSize: '35px' }} onClick={() => history.push(`/user/profile/${notic.username}`)} />
+                                            ) : (
+                                                <InfoIcon style={{ fontSize: '35px' }} onClick={() => history.push(`/post/postView/${notic?.id}`)} />
+                                            )}
+                                        </IconButton>
+                                    </ListItemSecondaryAction>
+                                </ListItem>
+                            )
+                        })
+                    )}
+                </List>
+            </Popover>
+        )
+    }
 
     const mobileMenuId = 'primary-search-account-menu-mobile';
     const renderMobileMenu = (
@@ -90,34 +180,30 @@ export const Navbar = (props) => {
             open={isMobileMenuOpen}
             onClose={handleMobileMenuClose}
         >
-            <MenuItem>
-                <IconButton aria-label="show 4 new mails" color="inherit">
-                    <Badge badgeContent={4} color="secondary">
+            <MenuItem component={Link} to='/user/inbox'>
+                <IconButton aria-label="show n new mails" color="inherit">
+                    <Badge badgeContent={0} color="secondary">
                         <MessageIcon />
                     </Badge>
                 </IconButton>
                 <p>Messages</p>
             </MenuItem>
-            <MenuItem>
-                <IconButton aria-label="show 11 new notifications" color="inherit">
-                    <Badge badgeContent={11} color="secondary">
+            <MenuItem onClick={(e) => setOpenPop2(e.currentTarget)} aria-describedby={id2}>
+                <IconButton aria-label="show n new notifications" color="inherit">
+                    <Badge badgeContent={user?.notificationCount} color="secondary">
                         <NotificationsIcon />
                     </Badge>
                 </IconButton>
                 <p>Notifications</p>
             </MenuItem>
-            <MenuItem onClick={handleProfileMenuOpen}>
-                <IconButton
-                    aria-label="account of current user"
-                    aria-controls="primary-search-account-menu"
-                    aria-haspopup="true"
-                    color="inherit"
-                >
-                    <AccountCircle />
+            <Popover2 />
+            <MenuItem onClick={handleProfileView}>
+                <IconButton aria-label="account of current user" color="inherit">
+                    <Avatar alt={user?.name} src={user?.profilePicture} />
                 </IconButton>
                 <p>Profile</p>
             </MenuItem>
-            <MenuItem>
+            <MenuItem onClick={() => logout()}>
                 <IconButton aria-label="show 4 new mails" color="inherit">
                     <Badge color="secondary">
                         <ExitToAppIcon />
@@ -139,7 +225,7 @@ export const Navbar = (props) => {
                                 <img src={logo} alt='logo' className={classes.logo} />
                             </Link>
                             <div className={classes.grow} />
-                            <div className={classes.search}>
+                            <div className={classes.search} aria-describedby={id1}>
                                 <div className={classes.searchIcon}>
                                     <SearchIcon />
                                 </div>
@@ -149,9 +235,13 @@ export const Navbar = (props) => {
                                         root: classes.inputRoot,
                                         input: classes.inputInput,
                                     }}
+                                    value={query}
+                                    onChange={(e) => setQuery(e.target.value)}
+                                    onKeyPress={(e) => { if (e.charCode === 13) { handleQuerySearch(e) } }}
                                     inputProps={{ 'aria-label': 'search' }}
                                 />
                             </div>
+                            <Popover1 />
                             <div className={classes.grow} />
                             {
                                 user ? (
@@ -164,44 +254,49 @@ export const Navbar = (props) => {
                                                 component={Link}
                                                 to='/'
                                             >
-                                                <HomeIcon style={{ fontSize: '30px' }} />
+                                                <HomeIcon style={{ fontSize: '32px' }} />
                                             </IconButton>
                                             <IconButton aria-label="show 4 new mails" color="inherit" component={Link} to='/user/inbox'>
-                                                <Badge badgeContent={4} color="secondary">
-                                                    <MessageIcon style={{ fontSize: '25px' }} />
+                                                <Badge badgeContent={0} color="secondary">
+                                                    <MessageIcon style={{ fontSize: '29px' }} />
                                                 </Badge>
                                             </IconButton>
-                                            <IconButton aria-label="show 17 new notifications" color="inherit">
-                                                <Badge badgeContent={17} color="secondary">
-                                                    <NotificationsIcon style={{ fontSize: '25px' }} />
+                                            <IconButton onClick={(e) => setOpenPop2(e.currentTarget)} aria-describedby={id2} aria-label="show 17 new notifications" color="inherit">
+                                                <Badge badgeContent={user?.notificationCount} color="secondary">
+                                                    <NotificationsIcon style={{ fontSize: '31px' }} />
                                                 </Badge>
                                             </IconButton>
+                                            <Popover2 />
                                             <IconButton aria-label="show 4 new mails" color="inherit" onClick={handleProfileView}>
                                                 <Avatar alt={user?.name} src={user?.profilePicture} />
                                             </IconButton>
-                                        </div>
-                                        <Button variant='outlined' color="secondary" onClick={()=> logout()}>logout</Button>
-                                        <div className={classes.sectionMobile}>
-                                            <IconButton
-                                                aria-label="show more"
-                                                aria-controls={mobileMenuId}
-                                                aria-haspopup="true"
-                                                onClick={handleMobileMenuOpen}
-                                                color="inherit"
-                                            >
-                                                <MoreIcon />
+                                            <IconButton color='secondary' aria-label="logout" color="inherit" onClick={() => logout()}>
+                                                <ExitToAppIcon style={{ fontSize: '37px', color: 'crimson' }} />
                                             </IconButton>
+                                        </div>
+                                        <div className={classes.sectionMobile}>
+                                            {user === null ? (
+                                                <Button component={Link} to="/user/auth" variant='outlined' color='primary' >Sing In</Button>
+                                            ) : (
+                                                <IconButton
+                                                    aria-label="show more"
+                                                    aria-controls={mobileMenuId}
+                                                    aria-haspopup="true"
+                                                    onClick={handleMobileMenuOpen}
+                                                    color="inherit"
+                                                >
+                                                    <Avatar alt={user?.name} src={user?.profilePicture} />
+                                                </IconButton>
+                                            )}
                                         </div>
                                     </>
                                 ) : (
                                     <Button component={Link} to="/user/auth" variant='outlined' color='primary' >Sing In</Button>
                                 )
                             }
-
                         </Toolbar>
                     </AppBar>
                     {renderMobileMenu}
-                    {renderMenu}
                 </div>
             </ElevationScroll>
             <Toolbar />

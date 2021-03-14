@@ -133,7 +133,7 @@ export const Feeds = ({ post }) => {
                         </Dialog>
                     </>
                 }
-                title={<Typography className={classes.user_dialog} variant='h6'>{post.username}</Typography>}
+                title={<Typography onClick={() => history.push(`/user/profile/${post.username}`)} className={classes.user_dialog} variant='h6'>{post.username}</Typography>}
                 subheader={moment(post.createdAt).fromNow()}
             />
             <div className={classes.line} />
@@ -152,11 +152,11 @@ export const Feeds = ({ post }) => {
                 </IconButton>
             </CardActions>
             <CardContent style={{ marginTop: '-21px' }}>
-                <div>
+                <div style={{ display: 'flex' }}>
                     <Typography color='textPrimary' variant='h6'>{post.likes.length} like{post.likes.length > 1 ? 's' : ''}</Typography>
                 </div>
                 <div>
-                    <Typography className={classes.user_dialog} color='textPrimary' variant='h6'>{post.username}</Typography> &nbsp;{post.message}
+                    <Typography onClick={() => history.push(`/user/profile/${post.username}`)} className={classes.user_dialog} color='textPrimary' variant='h6'>{post.username}</Typography> &nbsp;{post.message}
                 </div>
                 <div>
                     <Typography
@@ -173,7 +173,7 @@ export const Feeds = ({ post }) => {
                 </div>
                 {post.comments.length > 0 && (
                     <div>
-                        <Typography className={classes.user_dialog} color='textPrimary' variant='h6'>
+                        <Typography onClick={() => history.push(`/user/profile/${post.username}`)} className={classes.user_dialog} color='textPrimary' variant='h6'>
                             {JSON.parse(post.comments[post.comments.length - 1]).username}
                         </Typography> &nbsp;
                         {JSON.parse(post.comments[post.comments.length - 1]).comment}
@@ -181,7 +181,7 @@ export const Feeds = ({ post }) => {
                 )}
                 {post.comments.length > 1 && (
                     <div>
-                        <Typography className={classes.user_dialog} color='textPrimary' variant='h6'>
+                        <Typography onClick={() => history.push(`/user/profile/${post.username}`)} className={classes.user_dialog} color='textPrimary' variant='h6'>
                             {JSON.parse(post.comments[post.comments.length - 2]).username}
                         </Typography> &nbsp;
                         {JSON.parse(post.comments[post.comments.length - 2]).comment}

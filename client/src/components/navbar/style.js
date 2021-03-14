@@ -15,10 +15,11 @@ export const useStyles = makeStyles((theme) => ({
     },
     search: {
         position: 'relative',
+        border: '1px solid black',
         borderRadius: theme.shape.borderRadius,
         backgroundColor: fade(theme.palette.common.white, 0.15),
         '&:hover': {
-            backgroundColor: fade(theme.palette.common.white, 0.25),
+            backgroundColor: fade(theme.palette.common.white, 0.55),
         },
         marginRight: theme.spacing(2),
         marginLeft: 0,
@@ -29,7 +30,7 @@ export const useStyles = makeStyles((theme) => ({
         },
     },
     searchIcon: {
-        padding: theme.spacing(0, 2),
+        padding: theme.spacing(0, 1),
         height: '100%',
         position: 'absolute',
         pointerEvents: 'none',
@@ -43,7 +44,7 @@ export const useStyles = makeStyles((theme) => ({
     inputInput: {
         padding: theme.spacing(1, 1, 1, 0),
         // vertical padding + font size from searchIcon
-        paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+        paddingLeft: `calc(1em + ${theme.spacing(2.5)}px)`,
         transition: theme.transitions.create('width'),
         width: '100%',
         [theme.breakpoints.up('sm')]: {
@@ -62,11 +63,24 @@ export const useStyles = makeStyles((theme) => ({
             display: 'none',
         },
     },
+    logout: {
+        display: 'flex',
+        [theme.breakpoints.down('xs')]: {
+            display: 'none',
+        },
+    },
     logo: {
         width: '200px',
         height: '30px',
         [theme.breakpoints.down('sm')]: {
             width: '100px',
         },
-    }
+    },
+    user_dialog: {
+        display: 'inline-block',
+        cursor: 'pointer',
+        "&:hover": {
+            textDecoration: 'underline',
+        }
+    },
 }));

@@ -4,11 +4,6 @@ import jwt from 'jsonwebtoken'
 import nodemailer from 'nodemailer'
 import { SECRET_KEY, emailId, password } from '../private.js'
 
-// export const setCookie = (req, res) => {
-//     res.cookie('new', 'okay');
-//     console.log('cookies saved');
-//     res.send('hello dear')
-// }
 
 export const getOtp = (req, res) => {
     const targetEmail = req.body.email;
@@ -47,7 +42,7 @@ export const signin = async (req, res) => {
         const existingUser = await User.findOne({ username });
         if (!existingUser) return res.send({ message: "User doesn't exist" })
         if (existingUser.password !== password) return res.send({ message: "Invalid credentials." })
-        const token = jwt.sign({ username: existingUser.username, id: existingUser._id }, SECRET_KEY, { expiresIn: '3h' })
+        const token = jwt.sign({ username: existingUser.username, id: existingUser._id }, SECRET_KEY, { expiresIn: '7h' })
         return res.send({ user: existingUser, token });
     } catch (error) {
         return res.send({ message: "something went wrong." })
@@ -61,7 +56,7 @@ export const signup = async (req, res) => {
         if (existingUser) return res.send({ message: 'User already exist with given username.' });
         if (password !== confirmPassword) return res.send({ message: "password don't match" });
         const newUser = await User.create({ username, name: `${firstname} ${lastname}`, email, password });
-        const token = jwt.sign({ username: newUser.username, id: newUser._id }, SECRET_KEY, { expiresIn: '3h' })
+        const token = jwt.sign({ username: newUser.username, id: newUser._id }, SECRET_KEY, { expiresIn: '7h' })
         return res.send({ user: newUser, token });
     } catch (error) {
         return res.send({ message: "something went wrong." });
@@ -94,8 +89,8 @@ export const sendFollowRequest = async (req, res) => {
     try {
         if (isFollow) {
             // send notification and follow request
-            const notice = { username: user1, message: `has requested to follow you` };
-            await User.updateOne({ username: user2 }, { $push: { followRequest: user1, notification: notice } })
+            const notice = { username: user1, message: `has requested to follow you`, id: user1 };
+            await User.updateOne({ username: user2 }, { $push: { followRequest: user1, notification: notice }, $inc: { notificationCount: 1 } })
             await User.updateOne({ username: user1 }, { $push: { pendingRequest: user2 } })
             res.send({ message: "successed" })
         } else {
@@ -138,4 +133,21 @@ export const cancelFollowRequest = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
+}
+
+export const searchQuery = async (req, res) => {
+    const { query } = req.params;
+    const allUsers = await User.find().select({ username: 1, name: 1, profilePicture: 1 });
+    const regex = new RegExp(query, 'i')
+    var result = []
+    allUsers.forEach(element => {
+        if (regex.test(element.username) || regex.test(element.name))
+            result.push(element);
+    });
+    res.send(result);
+}
+
+export const clearNotice = async (req, res) => {
+    const { username } = req.params;
+    await User.findOneAndUpdate({ username }, { $set: { notificationCount: 0 } });
 }

@@ -19,6 +19,8 @@ export const signup = (signupData) => API.post('/user/signup', signupData);
 export const logout = () => API.get('/user/logout');
 export const findUser = (username) => API.get(`/user/profile/${username}`);
 export const updateProfile = (id, data) => API.patch(`/user/profile/update/${id}`, data);
+export const searchQuery = (query) => API.get(`/user/searchQuery/${query}`);
+export const clearNotice = (username) => API.patch(`/user/clearNotice/${username}`)
 
 
 export const followRequest = (data) => API.patch(`/user/follow/sendRequest`, data);
@@ -27,6 +29,7 @@ export const cancelFollowRequest = (data) => API.patch(`/user/follow/cancelReque
 
 
 export const getPosts = () => API.get('/post');
+export const findPost = (_id) => API.get(`/post/${_id}`)
 export const createPost = (data) => API.post(`/post/createPost`, data);
 export const like = (data) => API.patch('/post/like', data);
 export const comment = (data) => API.post('/post/comment', data);

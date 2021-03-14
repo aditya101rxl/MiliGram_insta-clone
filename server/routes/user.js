@@ -1,5 +1,5 @@
 import express from 'express';
-import { getOtp, signin, signup, findUser, updateProfile} from '../controller/user.js';
+import { getOtp, signin, signup, findUser, updateProfile, searchQuery, clearNotice } from '../controller/user.js';
 import { confirmFollowRequest, sendFollowRequest, cancelFollowRequest } from '../controller/user.js';
 import { auth } from '../middleware/auth.js';
 
@@ -16,5 +16,8 @@ router.patch('/profile/update/:id', auth, updateProfile)
 router.patch('/follow/sendRequest', auth, sendFollowRequest)
 router.patch('/follow/confirmRequest', auth, confirmFollowRequest)
 router.patch('/follow/cancelRequest', auth, cancelFollowRequest)
+
+router.get('/searchQuery/:query', searchQuery)
+router.patch('/clearNotice/:username', clearNotice)
 
 export default router;

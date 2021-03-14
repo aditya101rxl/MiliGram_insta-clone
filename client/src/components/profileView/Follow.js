@@ -6,15 +6,15 @@ import { useStyles } from './profile/style';
 
 export const Follow = ({ username, profilePicture }) => {
     const classes = useStyles()
-    const [followState, setFollowState] = useState(null);
+    const [followState, setFollowState] = useState(0);
     const { user } = useContext(GlobalContext);
 
     useEffect(() => {
-        if (user?.followRequest.indexOf(username) !== -1) { console.log('cnf'); setFollowState('confirm') }
-        else if (user?.pendingRequest.indexOf(username) !== -1) { console.log('cnc'); setFollowState('cancel') }
-        else if (user?.following.indexOf(username) != -1) { console.log('unf'); setFollowState('followback') }
-        else if (user?.followers.indexOf(username) != -1) { console.log('flobak'); setFollowState('unfollow') }
-        else { console.log('flo'); setFollowState('follow') }
+        if (user?.followRequest.indexOf(username) !== -1) { setFollowState('confirm') }
+        else if (user?.pendingRequest.indexOf(username) !== -1) { setFollowState('cancel') }
+        else if (user?.following.indexOf(username) != -1) { setFollowState('unfollow') }
+        else if (user?.followers.indexOf(username) != -1) { setFollowState('followback') }
+        else { setFollowState('follow') }
     }, [])
 
     const handleFollow = async () => {
@@ -29,7 +29,7 @@ export const Follow = ({ username, profilePicture }) => {
         const data = {
             user1: { username: user?.username, profilePicture: user?.profilePicture },
             user2: { username: username, profilePicture: profilePicture },
-            isFriend: (user?.followers.indexOf(username) != -1) || (user?.following.indexOf(username) != -1)
+            isFriend: (user?.followers.indexOf(username) !== -1) || (user?.following.indexOf(username) !== -1)
         }
         await api.confirmFollowRequest(data);
         setFollowState('unfollow')

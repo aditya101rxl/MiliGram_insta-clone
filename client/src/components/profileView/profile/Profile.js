@@ -35,13 +35,13 @@ export const Profile = () => {
     useEffect(() => {
         var userposts = [];
         for (let index = 0; index < posts.length; index++) {
-            const element = posts[index];
-            if (element.username == userFound?.username) {
-                userposts.push(element);
+            const post = posts[index];
+            if (post?.username === userFound?.username) {
+                userposts.push(post);
             }
         }
         setUserPosts([...userposts]);
-    }, [userFound])
+    }, [userFound, posts])
 
     const handleCreatePost = () => history.push('/post/createPost');
     const handleEdit = () => setEdit(prev => !prev)
@@ -54,7 +54,7 @@ export const Profile = () => {
 
     if (edit) {
         return (
-            <EditProfile user={user} setEdit={setEdit} />
+            <EditProfile user={user} setEdit={setEdit} history={history} />
         )
     }
 
@@ -105,9 +105,12 @@ export const Profile = () => {
                                     </Grid>
                                 </Grid>
                                 <div className={classes.header}>
-                                    {(userFound?._id) != (user?._id) && <Follow
-                                        username={userFound?.username} profilePicture={userFound?.profilePicture}
-                                    />}
+                                    {(user !== null) && (userFound?._id) != (user?._id) &&
+                                        <Follow
+                                            username={userFound?.username}
+                                            profilePicture={userFound?.profilePicture}
+                                        />
+                                    }
                                     {(userFound?._id) === (user?._id) && (
                                         <Button
                                             fullWidth
@@ -119,8 +122,8 @@ export const Profile = () => {
                                             <AddAPhotoIcon />
                                         </Button>
                                     )}
-                                    {((user?.followers.indexOf(userFound?.username) != -1) ||
-                                        (user?.following.indexOf(userFound?.username) != -1)) && (
+                                    {((user !== null) && ((user?.followers.indexOf(userFound?.username) !== -1) ||
+                                        (user?.following.indexOf(userFound?.username) !== -1))) && (
                                             <Button
                                                 fullWidth
                                                 variant="outlined"
@@ -136,15 +139,15 @@ export const Profile = () => {
                         </Grid>
                         <div className={classes.root1}>
                             {userPosts.length === 0 && (<Typography variant='overline' style={{ margin: '35%' }}>No Posts</Typography>)}
-                            <GridList cellHeight={600} >
+                            <GridList cellHeight={250} cols={3}>
                                 {userPosts.map((tile) => (
-                                    <GridListTile key={tile._id}>
-                                        <img src={tile.file} alt={tile.username} />
+                                    <GridListTile key={tile.img}>
+                                        <img style={{ display: 'block', margin: '0 auto', width: '100%' }} src={tile.file} />
                                         <GridListTileBar
                                             title={tile.message}
-                                            subtitle={<span>by: {tile.createdAt}</span>}
+                                            subtitle={<span>likes: {tile.likes.length} comments: {tile.comments.length}</span>}
                                             actionIcon={
-                                                <IconButton aria-label={`info about ${tile.username}`} className={classes.icon}>
+                                                <IconButton onClick={() => history.push(`/post/postView/${tile._id}`)} aria-label={`info about ${tile.username}`} className={classes.icon}>
                                                     <InfoIcon />
                                                 </IconButton>
                                             }
