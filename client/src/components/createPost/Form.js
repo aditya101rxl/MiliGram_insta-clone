@@ -1,11 +1,10 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { TextField, Button, Typography, Paper, GridList, GridListTile, Grid, Box } from '@material-ui/core'
 import FileBase from 'react-file-base64'
 import useStyle from "./style";
 import { useHistory } from 'react-router-dom'
-import defaultfile from '../defaultfile.png'
+import defaultfile from '../../images/defaultfile.png'
 import { GlobalContext } from '../../context/global/GlobalStates'
-import { Navbar } from "../navbar/Navbar";
 
 export const Form = () => {
     const classes = useStyle()
@@ -13,15 +12,10 @@ export const Form = () => {
     const [postData, setPostData] = useState({ message: '', tags: '', file: '' });
     const { createPost, user } = useContext(GlobalContext);
 
-    useEffect(() => {
-
-    }, [])
-
     const handleSubmit = (e) => {
         e.preventDefault()
         const data = { ...postData, name: user.name, username: user.username, profilePicture: user.profilePicture }
         createPost(data, history);
-
     }
 
     const clear = () => {

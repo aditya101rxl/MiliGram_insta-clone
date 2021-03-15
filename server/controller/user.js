@@ -43,9 +43,9 @@ export const signin = async (req, res) => {
         if (!existingUser) return res.send({ message: "User doesn't exist" })
         if (existingUser.password !== password) return res.send({ message: "Invalid credentials." })
         const token = jwt.sign({ username: existingUser.username, id: existingUser._id }, SECRET_KEY, { expiresIn: '7h' })
-        return res.send({ user: existingUser, token });
+        return res.send({ user: existingUser, token, message: `Welcome ${existingUser.username}` });
     } catch (error) {
-        return res.send({ message: "something went wrong." })
+        return res.status(404).send({});
     }
 }
 

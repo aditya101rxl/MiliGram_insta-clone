@@ -8,6 +8,9 @@ import { useHistory } from 'react-router-dom'
 import Slide from '@material-ui/core/Slide';
 import * as api from '../../api'
 import CloseIcon from '@material-ui/icons/Close';
+import { useSnackbar } from 'notistack'
+import { Backdrop, CircularProgress } from '@material-ui/core'
+import { LoadingAuth } from '../loading/auth'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -15,6 +18,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const initialState = { username: '', firstname: '', lastname: '', email: '', password: '', confirmPassword: '' };
 
 export const Auth = () => {
+    // document.title = 'User Auth'
     const classes = useStyle()
     const history = useHistory()
     const [isSignup, setIsSignup] = useState(false);
@@ -22,13 +26,26 @@ export const Auth = () => {
     const [openEmailDialog, setOpenEmailDialog] = useState(false);
     const [loginFormData, setLoginFormData] = useState(initialState);
 
+    const { enqueueSnackbar } = useSnackbar()
+
     const { signin, signup } = useContext(GlobalContext);
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = (e) => {
+        document.title = 'loading...'
+        setLoading(true);
         e.preventDefault()
         if (isSignup) {
             if (loginFormData.password !== loginFormData.confirmPassword) {
-                alert(`password don't match`);
+                const message = "password don't match !";
+                enqueueSnackbar(message, {
+                    variant: 'error',
+                    autoHideDuration: 3000,
+                    anchorOrigin: {
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                    },
+                });
             } else {
                 signup(loginFormData, history);
             }
@@ -41,7 +58,15 @@ export const Auth = () => {
     const [generatedOtp, setGeneratedOtp] = useState(null);
     const getOtp = async () => {
         if (loginFormData.email.indexOf('@') === -1) {
-            alert(`please enter valid email`)
+            const message = 'please enter valid email address !';
+            enqueueSnackbar(message, {
+                variant: 'warning',
+                autoHideDuration: 3000,
+                anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                },
+            });
         } else {
             try {
                 setOpenEmailDialog(true)
@@ -50,6 +75,15 @@ export const Auth = () => {
                 setGeneratedOtp(data.otp)
             } catch (error) {
                 console.log(error);
+                const message = 'something went wrong please try again !'
+                enqueueSnackbar(message, {
+                    variant: 'error',
+                    autoHideDuration: 3000,
+                    anchorOrigin: {
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                    },
+                });
             }
         }
     }
@@ -59,12 +93,30 @@ export const Auth = () => {
         const handleEmailVerification = () => {
             // console.log(generatedOtp);
             if (otp != generatedOtp) {
-                alert('You have entered wrong otp')
+                const message = 'You have entered wrong otp !'
+                enqueueSnackbar(message, {
+                    variant: 'warning',
+                    autoHideDuration: 3000,
+                    anchorOrigin: {
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                    },
+                });
             } else {
+                const message = 'email successfully verified.'
+                enqueueSnackbar(message, {
+                    variant: 'success',
+                    autoHideDuration: 3000,
+                    anchorOrigin: {
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                    },
+                });
                 setOpenEmailDialog(false);
                 setIsEmailVerified(prev => !prev);
             }
         }
+
         return (
             <>
                 <DialogTitle id="alert-dialog-slide-title">
@@ -100,65 +152,70 @@ export const Auth = () => {
     }
 
     return (
-        <Container component="main" maxWidth="xs">
-            <Paper className={classes.paper} elevation={3}>
-                <Avatar className={classes.avatar}>
-                    <LockOutlinedIcon />
-                </Avatar>
-                <Typography variant='h4'>{isSignup ? 'Sign Up' : 'Sign In'}</Typography>
-                <form className={classes.form} onSubmit={handleSubmit}>
-                    <Grid container spacing={1}>
-                        <Grid item xs={12}>
-                            <TextField name='username' label='User Name' type='text' required fullWidth onChange={handleChange} />
-                        </Grid>
-                        {isSignup && (
-                            <>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField name='firstname' label='First Name' type='text' required fullWidth onChange={handleChange} />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField name='lastname' label='Last Name' type='text' required fullWidth onChange={handleChange} />
-                                </Grid>
+        <>
+            <Container component="main" maxWidth="xs">
+                <Paper className={classes.paper} elevation={3}>
+                    <Avatar className={classes.avatar}>
+                        <LockOutlinedIcon />
+                    </Avatar>
+                    <Typography variant='h4'>{isSignup ? 'Sign Up' : 'Sign In'}</Typography>
+                    <form className={classes.form} onSubmit={handleSubmit}>
+                        <Grid container spacing={1}>
+                            <Grid item xs={12}>
+                                <TextField name='username' label='User Name' type='text' required fullWidth onChange={handleChange} />
+                            </Grid>
+                            {isSignup && (
+                                <>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField name='firstname' label='First Name' type='text' required fullWidth onChange={handleChange} />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField name='lastname' label='Last Name' type='text' required fullWidth onChange={handleChange} />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField disabled={isEmailVerified} name='email' label='Email Address' type='email' required fullWidth onChange={handleChange} />
+                                    </Grid>
+                                </>
+                            )}
+                            <Grid item xs={12}>
+                                <TextField name='password' label='Password' type='password' required fullWidth onChange={handleChange} />
+                            </Grid>
+                            {isSignup && (
                                 <Grid item xs={12}>
-                                    <TextField disabled={isEmailVerified} name='email' label='Email Address' type='email' required fullWidth onChange={handleChange} />
+                                    <TextField name='confirmPassword' label='Confirm Password' type='password' required fullWidth onChange={handleChange} />
                                 </Grid>
+                            )}
+                        </Grid>
+                        {!isEmailVerified && (
+                            <>
+                                <Button fullWidth variant="contained" color='primary' onClick={getOtp} className={classes.submit}>
+                                    Verify email
+                            </Button>
+                                <Dialog
+                                    open={openEmailDialog}
+                                    TransitionComponent={Transition}
+                                    keepMounted
+                                    // onClose={() => setOpenEmailDialog(false)}
+                                    aria-labelledby="alert-dialog-slide-title"
+                                    aria-describedby="alert-dialog-slide-description"
+                                >
+                                    <EmailVerification />
+                                </Dialog>
                             </>
                         )}
-                        <Grid item xs={12}>
-                            <TextField name='password' label='Password' type='password' required fullWidth onChange={handleChange} />
-                        </Grid>
-                        {isSignup && (
-                            <Grid item xs={12}>
-                                <TextField name='confirmPassword' label='Confirm Password' type='password' required fullWidth onChange={handleChange} />
-                            </Grid>
-                        )}
-                    </Grid>
-                    {!isEmailVerified && (
-                        <>
-                            <Button fullWidth variant="contained" color='primary' onClick={getOtp} className={classes.submit}>
-                                Verify email
-                            </Button>
-                            <Dialog
-                                open={openEmailDialog}
-                                TransitionComponent={Transition}
-                                keepMounted
-                                // onClose={() => setOpenEmailDialog(false)}
-                                aria-labelledby="alert-dialog-slide-title"
-                                aria-describedby="alert-dialog-slide-description"
-                            >
-                                <EmailVerification />
-                            </Dialog>
-                        </>
-                    )}
-                    <Button type='submit' disabled={!isEmailVerified} fullWidth variant="contained" color='primary' className={classes.submit}>
-                        {isSignup ? 'Sign Up' : 'Sign In'}
+                        <Button type='submit' disabled={!isEmailVerified} fullWidth variant="contained" color='primary' className={classes.submit}>
+                            {isSignup ? 'Sign Up' : 'Sign In'}
+                        </Button>
+                    </form>
+                    <Button className={classes.switch} onClick={switchMode}>
+                        {isSignup ? 'Already have an account? Sign In' : "Don't have an account? Sign In"}
                     </Button>
-                </form>
-                <Button className={classes.switch} onClick={switchMode}>
-                    {isSignup ? 'Already have an account? Sign In' : "Don't have an account? Sign In"}
-                </Button>
-            </Paper>
-        </Container >
+                </Paper>
+            </Container >
+            <Backdrop className={classes.backdrop} open={loading} >
+                <CircularProgress color="inherit" />
+            </Backdrop>
+        </>
     )
 }
 

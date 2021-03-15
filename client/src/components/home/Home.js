@@ -1,11 +1,10 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useContext } from 'react'
 import { Grid, Box } from '@material-ui/core'
 import { Feeds } from './feeds/Feeds';
 import { Profile } from './profile/Profile'
-import LinearProgress from '@material-ui/core/LinearProgress';
 import { makeStyles } from '@material-ui/core/styles';
 import { GlobalContext } from '../../context/global/GlobalStates'
-import { Navbar } from '../navbar/Navbar';
+import { LoadingFeed } from '../loading/home'
 
 const useStyles = makeStyles((theme) => ({
     sectionMobile: {
@@ -23,18 +22,18 @@ const useStyles = makeStyles((theme) => ({
 
 export const Home = () => {
 
+    document.title = 'Home'
     const classes = useStyles();
-
-    const { posts } = useContext(GlobalContext);
+    const { posts, user } = useContext(GlobalContext);
 
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} sm={8}>
-                <Box component="div" style={{marginTop:'5px'}} className={classes.scrollbar}>
+                <Box component="div" style={{ marginTop: '5px' }} className={classes.scrollbar}>
                     {posts.length ? (
                         posts.map(post => <Feeds post={post} />)
                     ) : (
-                        <LinearProgress color="secondary" />
+                        <LoadingFeed />
                     )}
                 </Box>
             </Grid>

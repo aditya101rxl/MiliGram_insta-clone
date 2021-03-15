@@ -1,20 +1,18 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { InputBase, AppBar, Toolbar, Typography, CssBaseline, ListItemSecondaryAction } from '@material-ui/core'
 import { useScrollTrigger, Popover, IconButton, Badge, Menu, MenuItem, Button, Avatar } from '@material-ui/core'
 import { ListItem, List, ListItemText, ListItemAvatar, Divider, CircularProgress } from '@material-ui/core'
 import ClearAllIcon from '@material-ui/icons/ClearAll';
 import SearchIcon from '@material-ui/icons/Search';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import MessageIcon from '@material-ui/icons/Message';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import MoreIcon from '@material-ui/icons/MoreVert';
 import HomeIcon from '@material-ui/icons/Home';
 import { useStyles } from './style';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import { Link, useHistory } from 'react-router-dom'
 import InfoIcon from '@material-ui/icons/Info';
-import logo from '../logo.png'
+import logo from '../../images/logo.png'
 import { GlobalContext } from '../../context/global/GlobalStates';
 import * as api from '../../api'
 
@@ -147,12 +145,12 @@ export const Navbar = (props) => {
                                     <ListItemText
                                         style={{ marginTop: '0', marginBottom: '-1px' }}
                                         primary={
-                                            <Typography onClick={() => history.push(`/user/profile/${notic.username}`)} className={classes.user_dialog} color='textPrimary' variant='h6'>{notic.username}</Typography>
+                                            <Typography onClick={() => { setOpenPop2(null); history.push(`/user/profile/${notic.username}`) }} className={classes.user_dialog} color='textPrimary' variant='h6'>{notic.username}</Typography>
                                         }
                                         secondary={<div style={{ marginTop: '-7px' }}>{notic.message}</div>}
                                     />
                                     <ListItemSecondaryAction>
-                                        <IconButton edge="end" aria-label="comments">
+                                        <IconButton edge="end" aria-label="comments" onClick={() => setOpenPop2(null)}>
                                             {(notic.message.indexOf('requested') !== -1) ? (
                                                 <InfoIcon style={{ fontSize: '35px' }} onClick={() => history.push(`/user/profile/${notic.username}`)} />
                                             ) : (
@@ -266,7 +264,7 @@ export const Navbar = (props) => {
                                                     <NotificationsIcon style={{ fontSize: '31px' }} />
                                                 </Badge>
                                             </IconButton>
-                                            <Popover2 />
+                                            <Popover2 setOpenPop2={setOpenPop2} />
                                             <IconButton aria-label="show 4 new mails" color="inherit" onClick={handleProfileView}>
                                                 <Avatar alt={user?.name} src={user?.profilePicture} />
                                             </IconButton>

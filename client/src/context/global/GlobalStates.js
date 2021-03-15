@@ -3,6 +3,7 @@ import GlobalReducer from './GlobalReducer'
 import * as api from '../../api'
 import io from 'socket.io-client'
 import Cookies from 'universal-cookie';
+import { useSnackbar } from 'notistack'
 
 
 const initialState = {
@@ -17,17 +18,39 @@ const cookies = new Cookies();
 export const GlobalProvider = ({ children }) => {
 
     const [state, dispatch] = useReducer(GlobalReducer, initialState);
+    const { enqueueSnackbar } = useSnackbar()
     // Actions
     const signin = async (formData, history) => {
         try {
+            let variant = 'error'
             const { data } = await api.signin(formData)
-            const socketio = io.connect('http://localhost:5000', { query: { user: data.user?.username } });
-            const token = { token: data.token, username: data.user.username };
-            cookies.set('jwt', token, { maxAge: 7 * 60 * 60 });
-            dispatch({ type: 'SIGNIN', payload: { data, socketio } })
-            history.push('/')
+            if (data.user != undefined) {
+                const socketio = io.connect('http://localhost:5000', { query: { user: data.user?.username } });
+                const token = { token: data.token, username: data.user.username };
+                cookies.set('jwt', token, { maxAge: 7 * 60 * 60 });
+                dispatch({ type: 'SIGNIN', payload: { data, socketio } })
+                history.push('/')
+                variant = 'success'
+            }
+            enqueueSnackbar(data.message, {
+                variant,
+                autoHideDuration: 2500,
+                anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                },
+            });
         } catch (error) {
             console.log(error);
+            const message = "something went wrong, try again !";
+            enqueueSnackbar(message, {
+                variant: 'error',
+                autoHideDuration: 2500,
+                anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                },
+            });
         }
     }
 
