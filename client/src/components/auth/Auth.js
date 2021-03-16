@@ -18,7 +18,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const initialState = { username: '', firstname: '', lastname: '', email: '', password: '', confirmPassword: '' };
 
 export const Auth = () => {
-    // document.title = 'User Auth'
+    document.title = 'User Auth'
     const classes = useStyle()
     const history = useHistory()
     const [isSignup, setIsSignup] = useState(false);
@@ -31,7 +31,7 @@ export const Auth = () => {
     const { signin, signup } = useContext(GlobalContext);
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         document.title = 'loading...'
         setLoading(true);
         e.preventDefault()
@@ -47,11 +47,12 @@ export const Auth = () => {
                     },
                 });
             } else {
-                signup(loginFormData, history);
+                await signup(loginFormData, history);
             }
         } else {
-            signin(loginFormData, history);
+            await signin(loginFormData, history);
         }
+        setLoading(false);
     }
     const handleChange = (e) => setLoginFormData({ ...loginFormData, [e.target.name]: e.target.value });
     const switchMode = () => { setIsSignup(prev => !prev); setIsEmailVerified(isSignup) }
@@ -69,12 +70,15 @@ export const Auth = () => {
             });
         } else {
             try {
-                setOpenEmailDialog(true)
+                setLoading(true)
                 const { data } = await api.getOtp({ email: loginFormData.email });
                 console.log(data.otp);
+                setLoading(false)
+                setOpenEmailDialog(true)
                 setGeneratedOtp(data.otp)
             } catch (error) {
                 console.log(error);
+                setLoading(false)
                 const message = 'something went wrong please try again !'
                 enqueueSnackbar(message, {
                     variant: 'error',
@@ -213,7 +217,8 @@ export const Auth = () => {
                 </Paper>
             </Container >
             <Backdrop className={classes.backdrop} open={loading} >
-                <CircularProgress color="inherit" />
+                <CircularProgress color="inherit" /> &nbsp;
+                    loading...
             </Backdrop>
         </>
     )

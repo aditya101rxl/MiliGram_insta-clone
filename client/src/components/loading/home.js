@@ -47,9 +47,6 @@ export const LoadingFeed = () => {
     return (
         <>
             <Media />
-            <Media />
-            <Media />
-            <Media />
         </>
     );
 }

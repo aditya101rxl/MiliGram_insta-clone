@@ -33,7 +33,12 @@ export const Home = () => {
                     {posts.length ? (
                         posts.map(post => <Feeds post={post} />)
                     ) : (
-                        <LoadingFeed />
+                        <>
+                            <LoadingFeed />
+                            <LoadingFeed />
+                            <LoadingFeed />
+                            <LoadingFeed />
+                        </>
                     )}
                 </Box>
             </Grid>

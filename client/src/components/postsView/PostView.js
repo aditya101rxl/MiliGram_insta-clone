@@ -2,13 +2,14 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import { makeStyles } from '@material-ui/core/styles';
-import { useHistory, useParams } from 'react-router-dom'
+import { useHistory, useLocation, useParams } from 'react-router-dom'
 import PropTypes from 'prop-types';
 import * as api from '../../api'
-import { LinearProgress, Tab, Paper, Tabs, Box, Typography } from '@material-ui/core';
+import { Tab, Paper, Tabs, Box, Typography } from '@material-ui/core';
 import { Feeds } from '../home/feeds/Feeds';
 import CommentIcon from '@material-ui/icons/Comment';
 import { GlobalContext } from '../../context/global/GlobalStates';
+import { LoadingFeed } from '../loading/home';
 
 
 function TabPanel(props) {
@@ -30,13 +31,11 @@ function TabPanel(props) {
         </div>
     );
 }
-
 TabPanel.propTypes = {
     children: PropTypes.node,
     index: PropTypes.any.isRequired,
     value: PropTypes.any.isRequired,
 };
-
 function a11yProps(index) {
     return {
         id: `simple-tab-${index}`,
@@ -54,17 +53,22 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const PostView = () => {
+    document.title = 'post view'
     const classes = useStyles();
     const params = useParams();
     const history = useHistory()
+    const location = useLocation()
     const _id = params.id;
     const [post, setPost] = useState(0);
     const { user } = useContext(GlobalContext);
 
     useEffect(async () => {
+        setPost(0)
+        document.title = 'loading...'
         const { data } = await api.findPost(_id);
+        document.title = 'post view'
         setPost(data);
-    }, [])
+    }, [location])
 
     const [value, setValue] = React.useState(0);
 
@@ -104,7 +108,7 @@ export const PostView = () => {
 
     if (post === 0) {
         return (
-            <LinearProgress color='secondary' />
+            <LoadingFeed />
         )
     }
     return (

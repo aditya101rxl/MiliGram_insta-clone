@@ -56,14 +56,35 @@ export const GlobalProvider = ({ children }) => {
 
     const signup = async (formData, history) => {
         try {
+            let variant = 'error'
             const { data } = await api.signup(formData);
-            const socketio = io.connect('http://localhost:5000', { query: { user: data.user.username } });
-            const token = { token: data.token, username: data.user.username };
-            cookies.set('jwt', token, { maxAge: 7 * 60 * 60 });
-            dispatch({ type: 'SIGNUP', payload: { data, socketio } })
-            history.push('/')
+            if (data.user != undefined) {
+                const socketio = io.connect('http://localhost:5000', { query: { user: data.user.username } });
+                const token = { token: data.token, username: data.user.username };
+                cookies.set('jwt', token, { maxAge: 7 * 60 * 60 });
+                dispatch({ type: 'SIGNUP', payload: { data, socketio } })
+                history.push('/')
+                variant = 'success'
+            }
+            enqueueSnackbar(data.message, {
+                variant,
+                autoHideDuration: 2500,
+                anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                },
+            });
         } catch (error) {
             console.log(error);
+            const message = "something went wrong, try again !";
+            enqueueSnackbar(message, {
+                variant: 'error',
+                autoHideDuration: 2500,
+                anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                },
+            });
         }
     }
 

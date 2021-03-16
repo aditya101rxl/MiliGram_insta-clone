@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { TextField, Button, Typography, Paper, GridList, GridListTile, Grid, Box } from '@material-ui/core'
+import { Backdrop, CircularProgress } from '@material-ui/core'
 import FileBase from 'react-file-base64'
 import useStyle from "./style";
 import { useHistory } from 'react-router-dom'
@@ -7,15 +8,16 @@ import defaultfile from '../../images/defaultfile.png'
 import { GlobalContext } from '../../context/global/GlobalStates'
 
 export const Form = () => {
+    document.title = 'creating new post'
     const classes = useStyle()
     const history = useHistory()
     const [postData, setPostData] = useState({ message: '', tags: '', file: '' });
     const { createPost, user } = useContext(GlobalContext);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
         const data = { ...postData, name: user.name, username: user.username, profilePicture: user.profilePicture }
-        createPost(data, history);
+        await createPost(data, history);
     }
 
     const clear = () => {
@@ -37,7 +39,17 @@ export const Form = () => {
             <Typography style={{ margin: "0 auto" }} variant='h4'>Create your own post</Typography>
             <form autoComplete="off" noValidate className={`${classes.root} ${classes.form}`} onSubmit={handleSubmit}>
                 <div className={classes.root}>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={1}>
+                        <Grid item xs={12} sm={4}>
+                            <GridList cellHeight={260} className={classes.gridList}>
+                                <GridListTile key={user._id}>
+                                    <img src={postData.file || defaultfile} alt='uploaded file' />
+                                </GridListTile>
+                            </GridList>
+                            <div className={classes.fileInput}>
+                                <FileBase accept="image/*" id="contained-button-file" type='file' multiple={false} onDone={({ base64 }) => setPostData({ ...postData, file: base64 })} />
+                            </div>
+                        </Grid>
                         <Grid item xs={12} sm={8}>
                             <Paper className={classes.paper}>
                                 <TextField name="message" variant="outlined" label="Message" fullWidth multiline rows={4} value={postData.message} onChange={(e) => setPostData({ ...postData, message: e.target.value })} />
@@ -55,16 +67,6 @@ export const Form = () => {
                                     </Grid>
                                 </Grid>
                             </Paper>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                            <GridList cellHeight={260} className={classes.gridList}>
-                                <GridListTile key={user._id}>
-                                    <img src={postData.file || defaultfile} alt='uploaded file' />
-                                </GridListTile>
-                            </GridList>
-                            <div className={classes.fileInput}>
-                                <FileBase accept="image/*" type='file' multiple={false} onDone={({ base64 }) => setPostData({ ...postData, file: base64 })} />
-                            </div>
                         </Grid>
                     </Grid>
                 </div>

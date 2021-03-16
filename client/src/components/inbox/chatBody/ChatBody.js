@@ -9,7 +9,7 @@ import { ChatProvider } from "../../../context/local/ChatStates";
 
 
 export const ChatBody = () => {
-
+    document.title = 'inbox'
     const { user } = useContext(GlobalContext)
 
 

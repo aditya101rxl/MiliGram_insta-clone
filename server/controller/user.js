@@ -53,11 +53,12 @@ export const signup = async (req, res) => {
     const { username, lastname, firstname, email, password, confirmPassword } = req.body;
     try {
         const existingUser = await User.findOne({ username }, 'username');
+        console.log(existingUser);
         if (existingUser) return res.send({ message: 'User already exist with given username.' });
         if (password !== confirmPassword) return res.send({ message: "password don't match" });
         const newUser = await User.create({ username, name: `${firstname} ${lastname}`, email, password });
         const token = jwt.sign({ username: newUser.username, id: newUser._id }, SECRET_KEY, { expiresIn: '7h' })
-        return res.send({ user: newUser, token });
+        return res.send({ user: newUser, token, message: `Welcome ${newUser.username}` });
     } catch (error) {
         return res.send({ message: "something went wrong." });
     }

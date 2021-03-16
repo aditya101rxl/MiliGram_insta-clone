@@ -63,7 +63,7 @@ export const Navbar = (props) => {
 
     const handleMobileMenuClose = () => setMobileMoreAnchorEl(null)
     const handleMobileMenuOpen = (event) => setMobileMoreAnchorEl(event.currentTarget)
-    const handleProfileView = () => history.push(`/user/profile/${user?.username}`)
+    const handleProfileView = () => { setMobileMoreAnchorEl(null); history.push(`/user/profile/${user?.username}`) }
 
     const Popover1 = () => {
         return (
@@ -145,12 +145,12 @@ export const Navbar = (props) => {
                                     <ListItemText
                                         style={{ marginTop: '0', marginBottom: '-1px' }}
                                         primary={
-                                            <Typography onClick={() => { setOpenPop2(null); history.push(`/user/profile/${notic.username}`) }} className={classes.user_dialog} color='textPrimary' variant='h6'>{notic.username}</Typography>
+                                            <Typography onClick={() => { setOpenPop2(null); setMobileMoreAnchorEl(null); history.push(`/user/profile/${notic.username}`) }} className={classes.user_dialog} color='textPrimary' variant='h6'>{notic.username}</Typography>
                                         }
                                         secondary={<div style={{ marginTop: '-7px' }}>{notic.message}</div>}
                                     />
                                     <ListItemSecondaryAction>
-                                        <IconButton edge="end" aria-label="comments" onClick={() => setOpenPop2(null)}>
+                                        <IconButton edge="end" aria-label="comments" onClick={() => { setOpenPop2(null); setMobileMoreAnchorEl(null) }}>
                                             {(notic.message.indexOf('requested') !== -1) ? (
                                                 <InfoIcon style={{ fontSize: '35px' }} onClick={() => history.push(`/user/profile/${notic.username}`)} />
                                             ) : (
@@ -178,7 +178,7 @@ export const Navbar = (props) => {
             open={isMobileMenuOpen}
             onClose={handleMobileMenuClose}
         >
-            <MenuItem component={Link} to='/user/inbox'>
+            <MenuItem onClick={() => setMobileMoreAnchorEl(null)} component={Link} to='/user/inbox'>
                 <IconButton aria-label="show n new mails" color="inherit">
                     <Badge badgeContent={0} color="secondary">
                         <MessageIcon />
@@ -186,7 +186,7 @@ export const Navbar = (props) => {
                 </IconButton>
                 <p>Messages</p>
             </MenuItem>
-            <MenuItem onClick={(e) => setOpenPop2(e.currentTarget)} aria-describedby={id2}>
+            <MenuItem onClick={(e) => { setOpenPop2(e.currentTarget); }} aria-describedby={id2}>
                 <IconButton aria-label="show n new notifications" color="inherit">
                     <Badge badgeContent={user?.notificationCount} color="secondary">
                         <NotificationsIcon />
@@ -201,7 +201,7 @@ export const Navbar = (props) => {
                 </IconButton>
                 <p>Profile</p>
             </MenuItem>
-            <MenuItem onClick={() => logout()}>
+            <MenuItem onClick={() => { logout(); setMobileMoreAnchorEl(null) }}>
                 <IconButton aria-label="show 4 new mails" color="inherit">
                     <Badge color="secondary">
                         <ExitToAppIcon />
@@ -283,7 +283,9 @@ export const Navbar = (props) => {
                                                     onClick={handleMobileMenuOpen}
                                                     color="inherit"
                                                 >
-                                                    <Avatar alt={user?.name} src={user?.profilePicture} />
+                                                    <Badge badgeContent={user?.notificationCount} color="secondary">
+                                                        <Avatar alt={user?.name} src={user?.profilePicture} />
+                                                    </Badge>
                                                 </IconButton>
                                             )}
                                         </div>

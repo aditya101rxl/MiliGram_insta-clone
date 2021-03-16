@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Paper, GridList, GridListTile, GridListTileBar, Typography, Button, Grid, IconButton } from '@material-ui/core'
+import { Paper, GridList, GridListTile, GridListTileBar, Typography, Button, Grid, IconButton, CircularProgress } from '@material-ui/core'
 import HomeIcon from '@material-ui/icons/Home'
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import EditIcon from '@material-ui/icons/Edit';
@@ -7,15 +7,16 @@ import InfoIcon from '@material-ui/icons/Info';
 import * as api from '../../../api'
 import { useStyles } from './style';
 import { Link, useHistory, useParams, useLocation } from 'react-router-dom'
-import LinearProgress from '@material-ui/core/LinearProgress';
 import { EditProfile } from '../edit/EditProfile';
 import { GlobalContext } from '../../../context/global/GlobalStates';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import SendIcon from '@material-ui/icons/Send';
 import { Follow } from '../Follow'
+import { LoadingProfile } from '../../loading/profile';
 
 
 export const Profile = () => {
+    document.title = 'profile view'
     const classes = useStyles()
     const history = useHistory()
     const location = useLocation()
@@ -48,7 +49,7 @@ export const Profile = () => {
 
     if (userFound === 0) {
         return (
-            <LinearProgress color="secondary" />
+            <LoadingProfile />
         )
     }
 
@@ -138,7 +139,8 @@ export const Profile = () => {
                             </Grid>
                         </Grid>
                         <div className={classes.root1}>
-                            {userPosts.length === 0 && (<Typography variant='overline' style={{ margin: '35%' }}>No Posts</Typography>)}
+                            {posts.length === 0 && (<div className={classes.header}><CircularProgress /></div>)}
+                            {(posts.length !== 0 & userPosts.length === 0) ? (<Typography variant='overline' style={{ margin: '35%' }}>No Posts</Typography>) : null}
                             <GridList cellHeight={250} cols={3}>
                                 {userPosts.map((tile) => (
                                     <GridListTile key={tile.img}>

@@ -7,6 +7,7 @@ import { useStyles } from './style';
 import { GlobalContext } from '../../../context/global/GlobalStates';
 
 export const EditProfile = ({ user, setEdit, history }) => {
+    document.title = 'edit user'
     const classes = useStyles();
     const { editUser } = useContext(GlobalContext)
     const [changes, setChanges] = useState({ name: user.name, email: user.email, status: user.status, profilePicture: user.profilePicture })
