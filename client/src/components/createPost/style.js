@@ -33,5 +33,9 @@ export default makeStyles((theme) => ({
     },
     input: {
         display: 'none',
-      },
+    },
+    backdrop: {
+        zIndex: theme.zIndex.drawer + 1,
+        color: '#fff',
+    },
 }));

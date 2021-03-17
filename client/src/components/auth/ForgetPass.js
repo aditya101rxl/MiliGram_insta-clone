@@ -9,7 +9,6 @@ import * as api from '../../api'
 import CloseIcon from '@material-ui/icons/Close';
 import { useSnackbar } from 'notistack'
 import { Backdrop, CircularProgress } from '@material-ui/core'
-import logo from '../../images/logo.png'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;

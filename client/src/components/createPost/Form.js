@@ -13,11 +13,14 @@ export const Form = () => {
     const history = useHistory()
     const [postData, setPostData] = useState({ message: '', tags: '', file: '' });
     const { createPost, user } = useContext(GlobalContext);
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setLoading(true);
         const data = { ...postData, name: user.name, username: user.username, profilePicture: user.profilePicture }
         await createPost(data, history);
+        setLoading(false);
     }
 
     const clear = () => {
@@ -35,42 +38,46 @@ export const Form = () => {
     }
 
     return (
-        <Paper className={classes.paper}>
-            <Typography style={{ margin: "0 auto" }} variant='h4'>Create your own post</Typography>
-            <form autoComplete="off" noValidate className={`${classes.root} ${classes.form}`} onSubmit={handleSubmit}>
-                <div className={classes.root}>
-                    <Grid container spacing={1}>
-                        <Grid item xs={12} sm={4}>
-                            <GridList cellHeight={260} className={classes.gridList}>
+        <>
+            <Paper className={classes.paper}>
+                <Typography style={{ margin: "0 auto" }} variant='h4'>Create your own post</Typography>
+                <form autoComplete="off" noValidate className={`${classes.root} ${classes.form}`} onSubmit={handleSubmit}>
+                    <div className={classes.root}>
+                        <Grid container spacing={1}>
+                            <Grid item xs={12} sm={4}>
                                 <GridListTile key={user._id}>
                                     <img src={postData.file || defaultfile} alt='uploaded file' />
                                 </GridListTile>
-                            </GridList>
-                            <div className={classes.fileInput}>
-                                <FileBase accept="image/*" id="contained-button-file" type='file' multiple={false} onDone={({ base64 }) => setPostData({ ...postData, file: base64 })} />
-                            </div>
-                        </Grid>
-                        <Grid item xs={12} sm={8}>
-                            <Paper className={classes.paper}>
-                                <TextField name="message" variant="outlined" label="Message" fullWidth multiline rows={4} value={postData.message} onChange={(e) => setPostData({ ...postData, message: e.target.value })} />
-                            </Paper >
-                            <Paper className={classes.paper}>
-                                <TextField name="tags" variant="outlined" label="Tags" fullWidth value={postData.tags} onChange={(e) => setPostData({ ...postData, tags: e.target.value.split(',') })} />
-                            </Paper>
-                            <Paper className={classes.paper}>
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6}>
-                                        <Button variant="contained" color="secondary" size="large" onClick={clear} fullWidth>Clear</Button>
+                                <div className={classes.fileInput}>
+                                    <FileBase accept="image/*" id="contained-button-file" type='file' multiple={false} onDone={({ base64 }) => setPostData({ ...postData, file: base64 })} />
+                                </div>
+                            </Grid>
+                            <Grid item xs={12} sm={8}>
+                                <Paper className={classes.paper}>
+                                    <TextField name="message" variant="outlined" label="Message" fullWidth multiline rows={4} value={postData.message} onChange={(e) => setPostData({ ...postData, message: e.target.value })} />
+                                </Paper >
+                                <Paper className={classes.paper}>
+                                    <TextField name="tags" variant="outlined" label="Tags" fullWidth value={postData.tags} onChange={(e) => setPostData({ ...postData, tags: e.target.value.split(',') })} />
+                                </Paper>
+                                <Paper className={classes.paper}>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12} sm={6}>
+                                            <Button variant="contained" color="secondary" size="large" onClick={clear} fullWidth>Clear</Button>
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <Button className={classes.buttonSubmit} variant="contained" color="primary" size="large" type="submit" fullWidth>Submit</Button>
+                                        </Grid>
                                     </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <Button className={classes.buttonSubmit} variant="contained" color="primary" size="large" type="submit" fullWidth>Submit</Button>
-                                    </Grid>
-                                </Grid>
-                            </Paper>
+                                </Paper>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </div>
-            </form>
-        </Paper>
+                    </div>
+                </form>
+            </Paper>
+            <Backdrop className={classes.backdrop} open={loading} >
+                <CircularProgress color="inherit" /> &nbsp;
+            loading...
+    </Backdrop>
+        </>
     );
 }
