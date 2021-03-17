@@ -1,39 +1,41 @@
 import User from '../models/user.js'
 import Chat from '../models/chat.js'
 import jwt from 'jsonwebtoken'
-import nodemailer from 'nodemailer'
-import { SECRET_KEY, emailId, password } from '../private.js'
+import { SECRET_KEY } from '../private.js'
+import { getOTP } from '../functions/user.js'
 
-
-export const getOtp = (req, res) => {
+export const verifyEmail = async (req, res) => {
     const targetEmail = req.body.email;
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: emailId,
-            pass: password
-        }
-    });
-    const randomInt = () => {
-        let low = 100000, high = 999999;
-        return Math.floor(Math.random() * (high - low + 1) + low);
+
+    let otp = await getOTP(targetEmail);
+    console.log('otp ' + otp);
+    if (otp == -1) {
+        res.status(400).json({});
+    } else if (otp == 0) {
+        res.send({ message: "Invalid email." });
+    } else {
+        res.send({ message: "Check your mail box", otp: otp })
     }
-    let otp = randomInt();
-    var mailOptions = {
-        from: 'no-replay@gmail.com',
-        to: targetEmail,
-        subject: 'email verification OTP',
-        text: `hello your OTP from email verification is  ${otp}`
-    };
-    transporter.sendMail(mailOptions, (err, info) => {
-        if (err) {
-            console.log(err);
-            res.status(400).json({});
-        } else {
-            console.log('Email sent');
-            res.send({ otp })
-        }
-    });
+}
+
+export const forgetPass = async (req, res) => {
+    const username = req.body.username
+    const { email } = await User.findOne({ username }).select({ email: 1 });
+    let otp = await getOTP(email);
+    console.log('otp ' + otp);
+    if (otp == -1) {
+        res.status(400).json({});
+    } else if (otp == 0) {
+        res.send({ message: "Something going wrong" });
+    } else {
+        res.send({ message: "Check your mail box", otp: otp })
+    }
+}
+
+export const setNewPassword = async (req, res) => {
+    const { username, password } = req.body;
+    await User.findOneAndUpdate({ username }, { $set: { password: password } });
+    res.send({ message: 'password successfully saved' })
 }
 
 export const signin = async (req, res) => {

@@ -1,66 +1,68 @@
 import React, { useState, useContext } from 'react'
 import { Avatar, Container, Paper, Typography, Grid, TextField, Button } from '@material-ui/core'
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import { Dialog, DialogContent, DialogContentText, DialogTitle, IconButton } from '@material-ui/core'
 import useStyle from './style'
-import { GlobalContext } from '../../context/global/GlobalStates'
 import { useHistory } from 'react-router-dom'
 import Slide from '@material-ui/core/Slide';
 import * as api from '../../api'
 import CloseIcon from '@material-ui/icons/Close';
 import { useSnackbar } from 'notistack'
 import { Backdrop, CircularProgress } from '@material-ui/core'
-import { LoadingAuth } from '../loading/auth'
 import logo from '../../images/logo.png'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
-const initialState = { username: '', firstname: '', lastname: '', email: '', password: '', confirmPassword: '' };
+const initialState = { username: '', password: '', confirmPassword: '' };
 
-export const Auth = () => {
-    document.title = 'User Auth'
+export const ForgetPass = () => {
+    document.title = 'setting new password'
     const classes = useStyle()
     const history = useHistory()
-    const [isSignup, setIsSignup] = useState(false);
-    const [isEmailVerified, setIsEmailVerified] = useState(true);
+    const [isVerified, setIsVerified] = useState(false);
+    const [isEmailVerified, setIsEmailVerified] = useState(false);
     const [openEmailDialog, setOpenEmailDialog] = useState(false);
     const [loginFormData, setLoginFormData] = useState(initialState);
 
     const { enqueueSnackbar } = useSnackbar()
 
-    const { signin, signup } = useContext(GlobalContext);
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         document.title = 'loading...'
         setLoading(true);
         e.preventDefault()
-        if (isSignup) {
-            if (loginFormData.password !== loginFormData.confirmPassword) {
-                const message = "password don't match !";
-                enqueueSnackbar(message, {
-                    variant: 'error',
-                    autoHideDuration: 3000,
-                    anchorOrigin: {
-                        vertical: 'bottom',
-                        horizontal: 'right',
-                    },
-                });
-            } else {
-                await signup(loginFormData, history);
-            }
+        if (loginFormData.password !== loginFormData.confirmPassword) {
+            const message = "password don't match !";
+            enqueueSnackbar(message, {
+                variant: 'error',
+                autoHideDuration: 3000,
+                anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                },
+            });
         } else {
-            await signin(loginFormData, history);
+            const { data } = await api.setNewPassword({ username: loginFormData.username, password: loginFormData.password })
+            enqueueSnackbar(data.message, {
+                variant: 'success',
+                autoHideDuration: 3000,
+                anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                },
+            });
+            history.push('/user/auth');
         }
         setLoading(false);
     }
     const handleChange = (e) => setLoginFormData({ ...loginFormData, [e.target.name]: e.target.value });
-    const switchMode = () => { setIsSignup(prev => !prev); setIsEmailVerified(isSignup) }
     const [generatedOtp, setGeneratedOtp] = useState(null);
+
     const getOtp = async () => {
-        if (loginFormData.email.indexOf('@') === -1) {
-            const message = 'please enter valid email address !';
+        if (loginFormData.username.length === 0) {
+            const message = 'please enter valid username !';
             enqueueSnackbar(message, {
                 variant: 'warning',
                 autoHideDuration: 3000,
@@ -72,9 +74,9 @@ export const Auth = () => {
         } else {
             try {
                 setLoading(true)
-                const { data } = await api.getOtp({ email: loginFormData.email, logo });
+                const { data } = await api.getOtpToSetNewPassword({ username: loginFormData.username });
                 console.log(data);
-                let variant = data.message.indexOf('Invalid') === -1 ? 'success' : 'error';
+                let variant = data.message.indexOf('box') !== -1 ? 'success' : 'error';
                 enqueueSnackbar(data.message, {
                     variant,
                     autoHideDuration: 3000,
@@ -117,7 +119,7 @@ export const Auth = () => {
                     },
                 });
             } else {
-                const message = 'email successfully verified.'
+                const message = 'email successfully verified. Set new Password'
                 enqueueSnackbar(message, {
                     variant: 'success',
                     autoHideDuration: 3000,
@@ -128,8 +130,10 @@ export const Auth = () => {
                 });
                 setOpenEmailDialog(false);
                 setIsEmailVerified(prev => !prev);
+                setIsVerified(true);
             }
         }
+
 
         return (
             <>
@@ -146,7 +150,7 @@ export const Auth = () => {
                 <DialogContent>
                     <DialogContentText id="alert-dialog-slide-description">
                         Enter the OTP sent on your given email address to verify your email.<br />
-                        It helps to recover your password in case you forget it.
+                        To set your new password.
                         <TextField
                             autoFocus
                             margin="dense"
@@ -170,41 +174,34 @@ export const Auth = () => {
             <Container component="main" maxWidth="xs">
                 <Paper className={classes.paper} elevation={3}>
                     <Avatar className={classes.avatar}>
-                        <LockOutlinedIcon />
+                        <VpnKeyIcon />
                     </Avatar>
-                    <Typography variant='h4'>{isSignup ? 'Sign Up' : 'Sign In'}</Typography>
+                    <Typography variant='h4'>Set Password</Typography>
                     <form className={classes.form} onSubmit={handleSubmit}>
                         <Grid container spacing={1}>
                             <Grid item xs={12}>
-                                <TextField name='username' label='User Name' type='text' required fullWidth onChange={handleChange} />
+                                <TextField disabled={isVerified} name='username' label='User Name' type='text' required fullWidth onChange={handleChange} />
                             </Grid>
-                            {isSignup && (
+                            {isVerified ? (
                                 <>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField name='firstname' label='First Name' type='text' required fullWidth onChange={handleChange} />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField name='lastname' label='Last Name' type='text' required fullWidth onChange={handleChange} />
+                                    <Grid item xs={12}>
+                                        <TextField name='password' label='new Password' type='password' required fullWidth onChange={handleChange} />
                                     </Grid>
                                     <Grid item xs={12}>
-                                        <TextField disabled={isEmailVerified} name='email' label='Email Address' type='email' required fullWidth onChange={handleChange} />
+                                        <TextField name='confirmPassword' label='Confirm new Password' type='password' required fullWidth onChange={handleChange} />
                                     </Grid>
+                                    {/* <Button fullWidth variant="contained" color='primary' onClick={getOtp} className={classes.submit}>
+                                        save password
+                                    </Button> */}
                                 </>
-                            )}
-                            <Grid item xs={12}>
-                                <TextField name='password' label='Password' type='password' required fullWidth onChange={handleChange} />
-                            </Grid>
-                            {isSignup && (
-                                <Grid item xs={12}>
-                                    <TextField name='confirmPassword' label='Confirm Password' type='password' required fullWidth onChange={handleChange} />
-                                </Grid>
+                            ) : (
+                                <Button fullWidth variant="contained" color='primary' onClick={getOtp} className={classes.submit}>
+                                    send OTP
+                                </Button>
                             )}
                         </Grid>
                         {!isEmailVerified && (
                             <>
-                                <Button fullWidth variant="contained" color='primary' onClick={getOtp} className={classes.submit}>
-                                    Verify email
-                            </Button>
                                 <Dialog
                                     open={openEmailDialog}
                                     TransitionComponent={Transition}
@@ -218,17 +215,12 @@ export const Auth = () => {
                             </>
                         )}
                         <Button type='submit' disabled={!isEmailVerified} fullWidth variant="contained" color='primary' className={classes.submit}>
-                            {isSignup ? 'Sign Up' : 'Sign In'}
+                            save password
                         </Button>
                     </form>
-                    <div>
-                        <Button className={classes.switch} onClick={() => history.push('/user/forgetPassword')}>
-                            {isSignup ? '' : "forget password"}
-                        </Button>
-                        <Button className={classes.switch} onClick={switchMode}>
-                            {isSignup ? 'Sign In' : "Sign Up"}
-                        </Button>
-                    </div>
+                    <Button className={classes.switch} onClick={() => history.push('/user/auth')}>
+                        cancel
+                    </Button>
                 </Paper>
             </Container >
             <Backdrop className={classes.backdrop} open={loading} >

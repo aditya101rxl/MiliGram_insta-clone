@@ -23,6 +23,10 @@ export const searchQuery = (query) => API.get(`/user/searchQuery/${query}`);
 export const clearNotice = (username) => API.patch(`/user/clearNotice/${username}`)
 
 
+export const getOtpToSetNewPassword = (data) => API.post('/user/forgetPassword', data);
+export const setNewPassword = (data) => API.patch('/user/setNewPassword', data);
+
+
 export const followRequest = (data) => API.patch(`/user/follow/sendRequest`, data);
 export const confirmFollowRequest = (data) => API.patch(`/user/follow/confirmRequest`, data);
 export const cancelFollowRequest = (data) => API.patch(`/user/follow/cancelRequest`, data);

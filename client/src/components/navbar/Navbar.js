@@ -81,7 +81,7 @@ export const Navbar = (props) => {
                     horizontal: 'center',
                 }}
             >
-                <List style={{ width: '250px' }}>
+                <List style={{ width: '250px', maxHeight: '350px' }}>
                     {result === null && (
                         <div style={{ display: 'flex', justifyContent: 'center' }}>
                             <CircularProgress />
@@ -130,7 +130,7 @@ export const Navbar = (props) => {
                     horizontal: 'center',
                 }}
             >
-                <List style={{ width: '250px' }}>
+                <List style={{ width: '250px', maxHeight: '350px' }}>
                     <Button style={{ display: 'block', marginLeft: 'auto' }} size='small' variant='text' onClick={() => clearNotice()}>
                         mark all as read &nbsp;
                         <ClearAllIcon />

@@ -9,6 +9,7 @@ import { Form } from './components/createPost/Form'
 import { PostView } from './components/postsView/PostView'
 import { ChatBody } from './components/inbox/chatBody/ChatBody'
 import { SnackbarProvider } from 'notistack'
+import { ForgetPass } from './components/auth/ForgetPass';
 
 const App = () => {
 
@@ -28,6 +29,7 @@ const App = () => {
             <Switch>
               <Route exact path="/" component={Home} />
               <Route exact path="/user/auth" component={Auth} />
+              <Route exact path="/user/forgetPassword" component={ForgetPass} />
               <Route exact path="/post/createPost" component={Form} />
               <Route exact path="/user/inbox" component={ChatBody} />
               <Route path="/post/postView/:id" component={PostView} />
