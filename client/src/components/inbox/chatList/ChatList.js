@@ -6,11 +6,21 @@ import AddBoxIcon from '@material-ui/icons/AddBox';
 import SearchIcon from '@material-ui/icons/Search';
 import { GlobalContext } from "../../../context/global/GlobalStates";
 import { ChatContext } from "../../../context/local/ChatStates";
+import { CircularProgress } from "@material-ui/core";
 
-export const ChatList = () => {
+export const ChatList = ({ setSelected }) => {
 
     const { user } = useContext(GlobalContext);
     const { chatList } = useContext(ChatContext);
+
+    console.log('chatlist rendering...');
+    if (chatList === null) {
+        return (
+            <div>
+                <CircularProgress />
+            </div>
+        )
+    }
 
     return (
         <div className="main__chatlist" >
@@ -36,21 +46,14 @@ export const ChatList = () => {
                 {chatList.map((item, index) => {
                     return (
                         <ChatListItems
-                            name={
-                                item?.user1?.username == user?.username ?
-                                    item?.user2.username :
-                                    item?.user1.username
-                            }
+                            name={item?.friend?.username}
                             id={item?._id}
                             key={item?._id}
                             animationDelay={index + 0.5}
                             active={false ? "active" : ""}
-                            isOnline={true ? "active" : ""}
-                            image={
-                                item?.user1?.username == user?.username ?
-                                    item?.user2?.profilePicture :
-                                    item?.user1?.profilePicture
-                            }
+                            isOnline={item.active ? "active" : ""}
+                            image={item?.friend?.profilePicture}
+                            setSelected={setSelected}
                         />
                     );
                 })}

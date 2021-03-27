@@ -1,8 +1,9 @@
 import React, { useContext } from "react";
 import { ChatContext } from "../../../context/local/ChatStates";
 import { Avatar } from "./Avatar";
+import { Typography } from '@material-ui/core'
 
-export const ChatListItems = ({ id, name, animationDelay, active, isOnline, image }) => {
+export const ChatListItems = ({ id, name, animationDelay, active, isOnline, image, setSelected }) => {
 
     const { selectChat } = useContext(ChatContext);
 
@@ -15,14 +16,17 @@ export const ChatListItems = ({ id, name, animationDelay, active, isOnline, imag
             e.currentTarget.parentNode.children[index].classList.remove("active");
         }
         e.currentTarget.classList.add("active");
-        selectChat(id)
+        const userInfo = { _id: id, username: name, profilePicture: image, isOnline: isOnline };
+        selectChat(userInfo)
+        setSelected(true);
     };
 
     return (
         <div
             style={{ animationDelay: `0.${animationDelay}s` }}
             onClick={select}
-            className={`chatlist__item ${active ? active : ""}`}>
+            className={`chatlist__item ${active ? active : ""}`}
+        >
             <Avatar
                 image={image ? image : "http://placehold.it/80x80"}
                 isOnline={isOnline}
@@ -30,7 +34,9 @@ export const ChatListItems = ({ id, name, animationDelay, active, isOnline, imag
 
             <div className="userMeta">
                 <p>{name}</p>
-                <span className="activeTime">7 mins ago</span>
+                <Typography variant='subtitle2' style={{ margin: '-7px 0', color: `${isOnline ? '#1dc51d' : 'grey'}` }}>
+                    {isOnline ? "online" : "last seen will update soon"}
+                </Typography>
             </div>
         </div>
     );

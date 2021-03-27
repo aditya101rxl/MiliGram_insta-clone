@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { Avatar } from "../chatList/Avatar";
+import React from "react";
+import DoneIcon from '@material-ui/icons/Done';
 
 export const ChatItem = ({ user, msg, image }) => {
 
@@ -12,10 +12,10 @@ export const ChatItem = ({ user, msg, image }) => {
                 <div className="chat__msg">{msg.m}</div>
                 <div className="chat__meta">
                     <span>{msg.time}</span>
-                    <span>Seen</span>
+                    <span><DoneIcon style={{ fontSize: '1rem' }} /></span>
                 </div>
             </div>
-            <Avatar isOnline="active" image={image} />
+            {/* <Avatar isOnline="active" image={image} /> */}
         </div>
     );
 }

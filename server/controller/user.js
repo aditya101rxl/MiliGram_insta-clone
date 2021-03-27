@@ -55,7 +55,6 @@ export const signup = async (req, res) => {
     const { username, lastname, firstname, email, password, confirmPassword } = req.body;
     try {
         const existingUser = await User.findOne({ username }, 'username');
-        console.log(existingUser);
         if (existingUser) return res.send({ message: 'User already exist with given username.' });
         if (password !== confirmPassword) return res.send({ message: "password don't match" });
         const newUser = await User.create({ username, name: `${firstname} ${lastname}`, email, password });
@@ -111,11 +110,23 @@ export const confirmFollowRequest = async (req, res) => {
     const { user1, user2, isFriend } = req.body;
     const newFriendChat = Chat({ user1, user2 });
     try {
-        await User.updateOne({ username: user1.username }, { $push: { followers: user2.username } })
-        await User.updateOne({ username: user2.username }, { $push: { following: user1.username } })
+        await User.updateOne(
+            { username: user1.username },
+            { $push: { followers: user2.username } }
+        )
+        await User.updateOne(
+            { username: user2.username },
+            { $push: { following: user1.username } }
+        )
 
-        await User.updateOne({ username: user1.username }, { $pull: { followRequest: user2.username } })
-        await User.updateOne({ username: user2.username }, { $pull: { pendingRequest: user1.username } })
+        await User.updateOne(
+            { username: user1.username },
+            { $pull: { followRequest: user2.username } }
+        )
+        await User.updateOne(
+            { username: user2.username },
+            { $pull: { pendingRequest: user1.username } }
+        )
 
         if (!isFriend) {
             await newFriendChat.save();

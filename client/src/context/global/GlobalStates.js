@@ -91,7 +91,7 @@ export const GlobalProvider = ({ children }) => {
     const logout = () => {
         cookies.remove('jwt');
         dispatch({ type: 'LOGOUT', payload: null })
-        window.location.reload();
+        // window.location.reload();
     }
 
     const createPost = async (formData, history) => {

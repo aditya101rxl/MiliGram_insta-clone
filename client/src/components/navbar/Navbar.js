@@ -15,6 +15,7 @@ import InfoIcon from '@material-ui/icons/Info';
 import logo from '../../images/logo.png'
 import { GlobalContext } from '../../context/global/GlobalStates';
 import * as api from '../../api'
+import { Slide } from '@material-ui/core'
 
 function ElevationScroll(props) {
 
@@ -31,6 +32,21 @@ function ElevationScroll(props) {
 }
 
 ElevationScroll.propTypes = {
+    children: PropTypes.element.isRequired,
+    window: PropTypes.func,
+};
+
+function HideOnScroll(props) {
+    const { children, window } = props;
+    const trigger = useScrollTrigger({ target: window ? window() : undefined });
+    return (
+        <Slide appear={false} direction="down" in={!trigger}>
+            {children}
+        </Slide>
+    );
+}
+
+HideOnScroll.propTypes = {
     children: PropTypes.element.isRequired,
     window: PropTypes.func,
 };
@@ -65,7 +81,7 @@ export const Navbar = (props) => {
     const handleMobileMenuOpen = (event) => setMobileMoreAnchorEl(event.currentTarget)
     const handleProfileView = () => { setMobileMoreAnchorEl(null); history.push(`/user/profile/${user?.username}`) }
 
-    const Popover1 = () => {
+    const SearchUser = () => {
         return (
             <Popover
                 id={id1}
@@ -114,7 +130,7 @@ export const Navbar = (props) => {
         )
     }
 
-    const Popover2 = () => {
+    const UserNotification = () => {
         return (
             <Popover
                 id={id2}
@@ -131,17 +147,35 @@ export const Navbar = (props) => {
                 }}
             >
                 <List style={{ width: '250px', maxHeight: '350px' }}>
-                    <Button style={{ display: 'block', marginLeft: 'auto' }} size='small' variant='text' onClick={() => clearNotice()}>
-                        mark all as read &nbsp;
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <p style={{ marginBottom: '-7px' }}>Notifications</p>
+                        <Link href onClick={(e) => { e.preventDefault(); clearNotice() }}>
+                            mark all as read
                         <ClearAllIcon />
-                    </Button>
+                        </Link>
+                    </div>
                     <div style={{ backgroundColor: 'grey', height: '1px' }}></div>
                     {user?.notification?.length === 0 ? (
                         <Typography>No notification</Typography>
                     ) : (
                         user?.notification?.slice(0).reverse().map((notic, index) => {
                             return (
-                                <ListItem style={{ backgroundColor: `${index < user?.notificationCount ? '#ecd2d2' : ''}` }} key={index} role={undefined} dense >
+                                <ListItem
+                                    button
+                                    style={{ backgroundColor: `${index < user?.notificationCount ? '#ecd2d2' : ''}` }}
+                                    key={index}
+                                    role={undefined}
+                                    dense
+                                    onClick={() => {
+                                        setOpenPop2(null);
+                                        setMobileMoreAnchorEl(null);
+                                        if (notic.message.indexOf('requested') !== -1) {
+                                            history.push(`/user/profile/${notic.username}`)
+                                        } else {
+                                            history.push(`/post/postView/${notic?.id}`)
+                                        }
+                                    }}
+                                >
                                     <ListItemText
                                         style={{ marginTop: '0', marginBottom: '-1px' }}
                                         primary={
@@ -149,15 +183,6 @@ export const Navbar = (props) => {
                                         }
                                         secondary={<div style={{ marginTop: '-7px' }}>{notic.message}</div>}
                                     />
-                                    <ListItemSecondaryAction>
-                                        <IconButton edge="end" aria-label="comments" onClick={() => { setOpenPop2(null); setMobileMoreAnchorEl(null) }}>
-                                            {(notic.message.indexOf('requested') !== -1) ? (
-                                                <InfoIcon style={{ fontSize: '35px' }} onClick={() => history.push(`/user/profile/${notic.username}`)} />
-                                            ) : (
-                                                <InfoIcon style={{ fontSize: '35px' }} onClick={() => history.push(`/post/postView/${notic?.id}`)} />
-                                            )}
-                                        </IconButton>
-                                    </ListItemSecondaryAction>
                                 </ListItem>
                             )
                         })
@@ -194,7 +219,7 @@ export const Navbar = (props) => {
                 </IconButton>
                 <p>Notifications</p>
             </MenuItem>
-            <Popover2 />
+            <UserNotification />
             <MenuItem onClick={handleProfileView}>
                 <IconButton aria-label="account of current user" color="inherit">
                     <Avatar alt={user?.name} src={user?.profilePicture} />
@@ -215,6 +240,7 @@ export const Navbar = (props) => {
     return (
         <React.Fragment >
             <CssBaseline />
+            {/* <HideOnScroll {...props}> */}
             <ElevationScroll {...props}>
                 <div className={classes.grow} >
                     <AppBar color='default'>
@@ -239,7 +265,7 @@ export const Navbar = (props) => {
                                     inputProps={{ 'aria-label': 'search' }}
                                 />
                             </div>
-                            <Popover1 />
+                            <SearchUser />
                             <div className={classes.grow} />
                             {
                                 user ? (
@@ -264,7 +290,7 @@ export const Navbar = (props) => {
                                                     <NotificationsIcon style={{ fontSize: '31px' }} />
                                                 </Badge>
                                             </IconButton>
-                                            <Popover2 setOpenPop2={setOpenPop2} />
+                                            <UserNotification setOpenPop2={setOpenPop2} />
                                             <IconButton aria-label="show 4 new mails" color="inherit" onClick={handleProfileView}>
                                                 <Avatar alt={user?.name} src={user?.profilePicture} />
                                             </IconButton>
@@ -299,6 +325,7 @@ export const Navbar = (props) => {
                     {renderMobileMenu}
                 </div>
             </ElevationScroll>
+            {/* </HideOnScroll> */}
             <Toolbar />
         </React.Fragment >
     );

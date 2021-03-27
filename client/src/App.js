@@ -8,6 +8,7 @@ import { Profile } from './components/profileView/profile/Profile'
 import { Form } from './components/createPost/Form'
 import { PostView } from './components/postsView/PostView'
 import { ChatBody } from './components/inbox/chatBody/ChatBody'
+import { Inbox } from './components/newInbox/Inbox'
 import { SnackbarProvider } from 'notistack'
 import { ForgetPass } from './components/auth/ForgetPass';
 
@@ -32,6 +33,7 @@ const App = () => {
               <Route exact path="/user/forgetPassword" component={ForgetPass} />
               <Route exact path="/post/createPost" component={Form} />
               <Route exact path="/user/inbox" component={ChatBody} />
+              {/* <Route exact path="/user/inbox" component={Inbox} /> */}
               <Route path="/post/postView/:id" component={PostView} />
               <Route path="/user/profile/:username" component={Profile} />
             </Switch>

@@ -3,23 +3,24 @@ import SendIcon from '@material-ui/icons/Send';
 import ImageIcon from '@material-ui/icons/Image';
 import SettingsIcon from '@material-ui/icons/Settings';
 import * as api from '../../../api'
-
+import TelegramIcon from '@material-ui/icons/Telegram';
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import "./chatContent.css";
 import { Avatar } from "../chatList/Avatar";
 import { ChatItem } from "./ChatItem";
 import { ChatContext } from "../../../context/local/ChatStates";
 import { GlobalContext } from "../../../context/global/GlobalStates";
+import { IconButton, Typography } from "@material-ui/core";
 
-export const ChatContent = () => {
+export const ChatContent = ({ setSelected }) => {
 
     const messagesEndRef = useRef(null);
-    const { activeChat} = useContext(ChatContext);
+    const { activeChat, clearActiveChat, userInfo } = useContext(ChatContext);
     const { user, socket } = useContext(GlobalContext)
-    const [msg, setMsg] = useState("");
-    const user1 = activeChat?.user1?.username === user?.username ? activeChat?.user1 : activeChat?.user2;
-    const user2 = activeChat?.user1?.username === user1?.username ? activeChat?.user2 : activeChat?.user1;
+    const msg = useRef("")
     const [allMsg, setAllMsg] = useState([]);
 
+    console.log(allMsg);
     const scrollToBottom = () => {
         messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     };
@@ -29,55 +30,46 @@ export const ChatContent = () => {
         return time;
     }
     useEffect(() => {
-        if (messagesEndRef.current != null)
-            scrollToBottom();
-    }, [allMsg])
-    useEffect(() => {
         if (activeChat !== null)
             setAllMsg(activeChat?.message);
     }, [activeChat])
-
-    const addMsg = (msg) => {
-        setAllMsg([...allMsg, msg]);
-    }
-
     useEffect(() => {
-        if (socket == null) return;
-        socket.on('receive', ({ msg }) => {
-            addMsg(msg);
+        console.log('mounted');
+        socket.on('receive', ({ newMsg }) => {
+            addMsg(newMsg);
         })
-    }, [socket, allMsg])
-
-    const handleSendMsgClick = (e) => {
-        if (msg != "") {
-            const stringifiedMsg = JSON.stringify({ user: user1.username, msg: { m: msg, time: getTime() } })
+        if (messagesEndRef.current != null)
+            scrollToBottom();
+        return () => {
+            console.log('unmounted');
+        }
+    }, [allMsg])
+    const addMsg = (newMsg) => { setAllMsg([...allMsg, newMsg]); }
+    const handleSendMsgClick = () => {
+        if (msg.current.value != "") {
+            const stringifiedMsg = JSON.stringify({ user: user.username, msg: { m: msg.current.value, time: getTime() } })
             // api call
-            api.sendMsg({ _id: activeChat?._id, msg: stringifiedMsg });
-            socket.emit('send', { to: user2.username, msg: stringifiedMsg })
+            api.sendMsg({ _id: activeChat?._id, newMsg: stringifiedMsg });
+            socket.emit('send', { to: userInfo.username, newMsg: stringifiedMsg })
             addMsg(stringifiedMsg);
-            setMsg("");
+            msg.current.value = "";
         }
     }
-
-    const handleSendMsg = (e) => {
-        if (e.charCode === 13 && msg != "") {
-            const stringifiedMsg = JSON.stringify({ user: user1.username, msg: { m: msg, time: getTime() } })
-            // api call
-            api.sendMsg({ _id: activeChat?._id, msg: stringifiedMsg });
-            socket.emit('send', { to: user2.username, msg: stringifiedMsg })
-            addMsg(stringifiedMsg);
-            setMsg("");
-        }
+    const handleSendMsg = (e) => { if (e.charCode === 13) { handleSendMsgClick() } }
+    const handleEmoji = (e) => { console.log('handle emoji click'); }
+    const handleChangeActive = () => {
+        clearActiveChat();
+        setSelected(false);
     }
-
-    const handleEmoji = (e) => {
-        console.log('handle emoji click');
-    }
-
     if (activeChat == null) {
         return (
-            <div>
-                Please select any one to chat
+            <div style={{ marginLeft: '30%', marginTop: '35%' }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <TelegramIcon />
+                    <Typography>
+                        Please select any one to chat
+                </Typography>
+                </div>
             </div>
         )
     }
@@ -87,23 +79,32 @@ export const ChatContent = () => {
             <div className="content__header">
                 <div className="blocks">
                     <div className="current-chatting-user">
+                        <IconButton onClick={handleChangeActive}>
+                            <ArrowBackIosIcon />
+                        </IconButton>
                         <Avatar
-                            isOnline="active"
-                            image={user2.profilePicture}
+                            isOnline={userInfo.isOnline ? "active" : ""}
+                            image={userInfo.profilePicture}
                         />
-                        <p>{user2.username}</p>
+                        <div>
+                            <p>{userInfo.username}</p>
+                            <Typography variant='subtitle2' style={{ margin: '-7px 0', color: `${userInfo.isOnline ? '#1dc51d' : 'grey'}` }}>
+                                {userInfo.isOnline ? "online" : "last seen will update soon"}
+                            </Typography>
+                        </div>
                     </div>
                 </div>
 
                 <div className="blocks">
                     <div className="settings">
-                        <button className="btn-nobg">
+                        <IconButton>
                             <SettingsIcon />
-                        </button>
+                        </IconButton>
                     </div>
                 </div>
             </div>
             <div className="content__body">
+                <Typography variant='inherit' style={{ display: 'flex', justifyContent: 'center' }}>your conversations with {userInfo.username}</Typography>
                 <div className="chat__items">
                     {allMsg.map((itm, index) => {
                         const item = JSON.parse(itm);
@@ -111,9 +112,9 @@ export const ChatContent = () => {
                             <ChatItem
                                 animationDelay={index + 1}
                                 key={index + 1}
-                                user={item.user === user1.username ? "me" : "other"}
+                                user={item.user === user.username ? "me" : "other"}
                                 msg={item.msg}
-                                image={item.user === user1.username ? user1.profilePicture : user2.profilePicture}
+                            // image={item.user === user1.username ? user1.profilePicture : user2.profilePicture}
                             />
                         );
                     })}
@@ -129,8 +130,7 @@ export const ChatContent = () => {
                         autoFocus
                         type="text"
                         placeholder="Type a message here"
-                        onChange={(e) => setMsg(e.target.value)}
-                        value={msg}
+                        ref={msg}
                         onKeyPress={handleSendMsg}
                     />
                     <button className="btnSendMsg" id="sendMsgBtn" onClick={handleSendMsgClick}>

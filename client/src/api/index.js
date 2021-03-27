@@ -41,4 +41,5 @@ export const deletePost = (_id) => API.delete(`/post/${_id}`)
 
 
 export const getChatList = (data) => API.post('/inbox/chatlist', data);
+export const getChatMsg = (_id) => API.get(`/inbox/getChatMsg/${_id}`)
 export const sendMsg = (data) => API.post('/inbox/sendmsg', data);

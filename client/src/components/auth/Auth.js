@@ -221,7 +221,7 @@ export const Auth = () => {
                             {isSignup ? 'Sign Up' : 'Sign In'}
                         </Button>
                     </form>
-                    <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                         <Button className={classes.switch} onClick={() => history.push('/user/forgetPassword')}>
                             {isSignup ? '' : "forget password"}
                         </Button>

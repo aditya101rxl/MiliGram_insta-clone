@@ -137,7 +137,7 @@ export const Feeds = ({ post }) => {
                 subheader={moment(post.createdAt).fromNow()}
             />
             <div className={classes.line} />
-            <div style={{ backgroundColor: 'red' }} onDoubleClick={handleLike}>
+            <div style={{ backgroundColor: 'none' }} onDoubleClick={handleLike}>
                 <img style={{ display: 'block', margin: '0 auto', width: '100%' }} src={post.file} />
             </div>
             <CardActions>

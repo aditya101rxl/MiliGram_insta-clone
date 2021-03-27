@@ -16,7 +16,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const initialState = { username: '', password: '', confirmPassword: '' };
 
 export const ForgetPass = () => {
-    document.title = 'setting new password'
+    document.title = 'set new password'
     const classes = useStyle()
     const history = useHistory()
     const [isVerified, setIsVerified] = useState(false);

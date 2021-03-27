@@ -3,7 +3,12 @@ export default (state, action) => {
         case 'CHATLIST':
             return { ...state, chatList: action.payload }
         case 'SELECT':
-            return { ...state, activeChat: action.payload }
+        case 'CLEARCHAT':
+            return {
+                ...state,
+                activeChat: action.payload.data,
+                userInfo: action.payload.userInfo,
+            }
         default:
             return state;
     }

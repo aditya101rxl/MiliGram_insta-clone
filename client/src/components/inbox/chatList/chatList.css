@@ -1,7 +1,7 @@
 .main__chatlist {
     border-right: 1px solid #ebe7fb;
     padding: 0 10px 0 0px;
-    width: 33%;
+    width: 100%;
   }
   .chatlist__heading {
     display: flex;
@@ -96,7 +96,7 @@
     padding: 0;
     color: #000;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 19px;
   }
   .chatlist__item .userMeta span {
     margin: 0;
@@ -124,7 +124,7 @@
     border: 2px solid #fff;
   }
   .isOnline.active {
-    background-color: tomato;
+    background-color: rgb(9, 206, 52);
   }
   .avatar-img {
     overflow: hidden;

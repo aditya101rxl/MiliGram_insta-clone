@@ -2,46 +2,46 @@ import React, { createContext, useContext, useEffect, useReducer } from 'react'
 import { GlobalContext } from '../global/GlobalStates';
 import ChatReducer from './ChatReducer'
 import * as api from '../../api'
-import { useHistory } from 'react-router-dom'
 
 
 const initialState = {
-    chatList: [],
+    chatList: null,
     activeChat: null,
+    userInfo: null,
 }
 
 export const ChatContext = createContext(initialState);
 
 export const ChatProvider = ({ children }) => {
 
-    const history = useHistory();
     const [state, dispatch] = useReducer(ChatReducer, initialState);
-    const { user, socket } = useContext(GlobalContext)
+    const { user } = useContext(GlobalContext)
 
+    console.log('change in ChatState');
     useEffect(async () => {
         const chatlist = user?.friends;
-        const { data } = await api.getChatList({ chatlist })
-        console.log(data?.mewwsage);
-        if (data?.message === undefined) {
-            dispatch({ type: 'CHATLIST', payload: data })
-        } else {
-            console.log(data.message);
-        }
+        const { data } = await api.getChatList({ chatlist, user: user.username })
+        dispatch({ type: 'CHATLIST', payload: data })
+        return () => console.log('unmount chat state');
     }, [])
 
-    const selectChat = (id) => {
-        state.chatList.forEach(element => {
-            if (element._id == id) {
-                dispatch({ type: 'SELECT', payload: element })
-            }
-        });
+    const selectChat = async (userInfo) => {
+        const id = userInfo._id;
+        const { data } = await api.getChatMsg(id);
+        console.log(data);
+        dispatch({ type: 'SELECT', payload: { data, userInfo } });
+    }
+    const clearActiveChat = () => {
+        dispatch({ type: 'CLEARCHAT', payload: { userInfo: null, data: null } });
     }
 
     return (
         <ChatContext.Provider value={{
             chatList: state.chatList,
+            userInfo: state.userInfo,
             activeChat: state.activeChat,
             selectChat,
+            clearActiveChat,
         }}>
             {children}
         </ChatContext.Provider>

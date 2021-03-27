@@ -7,7 +7,9 @@ export const Avatar = ({ image, isOnline }) => {
             <div className="avatar-img">
                 <img src={image} alt="#" />
             </div>
-            <span className={`isOnline ${isOnline}`}></span>
+            {isOnline === 'active' && (
+                <span className={`isOnline active`}></span>
+            )}
         </div>
     );
 
